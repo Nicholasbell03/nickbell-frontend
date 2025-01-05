@@ -29,6 +29,5 @@ dist-ssr
 .env.*
 
 # yarn
-.yarn/
-.yarnrc.yml
+.yarn
 .pnp.*
