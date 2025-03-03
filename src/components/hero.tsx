@@ -42,26 +42,26 @@ export default function Hero() {
         {/* Social links */}
         <div className="flex justify-center space-x-6 mt-8">
           <a 
-            href="https://github.com/nicholas-bell" 
+            href="https://github.com/Nicholasbell03" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-2xl"
+            className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
             aria-label="GitHub"
           >
             <FaGithub />
           </a>
           <a 
-            href="https://linkedin.com/in/nicholas-bell" 
+            href="https://linkedin.com/in/nicholas-j-bell" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-gray-400 hover:text-white transition-colors text-2xl"
+            className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
             aria-label="LinkedIn"
           >
             <FaLinkedin />
           </a>
           <a 
-            href="mailto:hello@nickbell.dev" 
-            className="text-gray-400 hover:text-white transition-colors text-2xl"
+            href="mailto:nicholasbell03@gmail.com" 
+            className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
             aria-label="Email"
           >
             <FaEnvelope />
