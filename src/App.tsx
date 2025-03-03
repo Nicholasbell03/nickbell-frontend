@@ -5,7 +5,7 @@ function App() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-900">
       <div className="max-w-2xl w-full text-center space-y-8">
         {/* Logo */}
-        <div className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+        <div className="text-4xl md:text-6xl font-bold bg-linear-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
           THEMORGZ
         </div>
 

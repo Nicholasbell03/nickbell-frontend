@@ -23,7 +23,7 @@ export default function Hero() {
       </div>
       
       <div className="z-10 text-center max-w-3xl">
-        <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-300 text-transparent bg-clip-text">
+        <h1 className="text-4xl md:text-6xl font-bold mb-2 bg-linear-to-r from-blue-400 to-cyan-300 text-transparent bg-clip-text">
           Nicholas Bell
         </h1>
         
