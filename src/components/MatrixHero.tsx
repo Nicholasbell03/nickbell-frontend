@@ -11,7 +11,7 @@ type MatrixHeroProps = {
 }
 
 export const MatrixHero: React.FC<MatrixHeroProps> = ({
-  numStreams = 30,
+  numStreams = 50,
   xMin = -20,
   xMax = 10,
   zMin = -10,
