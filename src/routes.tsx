@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
-const Hero = lazy(() => import('./components/hero'))
+import { MatrixHero } from "./components/MatrixHero"
+// const Hero = lazy(() => import('./components/hero'))
 
 function AppRoutes() {
   return (
@@ -9,7 +10,7 @@ function AppRoutes() {
             path="/" 
             element={
                 <Suspense fallback={<div>Loading...</div>}>
-                    <Hero />
+                    <MatrixHero />
                 </Suspense>
             } 
         />
