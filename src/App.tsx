@@ -1,8 +1,6 @@
-import { useState } from 'react'
+import { FaGithub, FaTwitter, FaLinkedin } from 'react-icons/fa';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <div className="max-w-5xl mx-auto p-8 text-center bg-gray-100 dark:bg-gray-800">
       <div className="flex items-center justify-center min-h-screen">
@@ -25,9 +23,42 @@ function App() {
             Click on the Vite and React logos to learn more
           </p>
         </div>
+
+        {/* Social Links */}
+        <div className="flex justify-center space-x-6 pt-8">
+          <a
+            href="https://twitter.com/themorgz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-blue-400 transition-colors"
+          >
+            <FaTwitter size={24} />
+          </a>
+          <a
+            href="https://github.com/themorgz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-blue-400 transition-colors"
+          >
+            <FaGithub size={24} />
+          </a>
+          <a
+            href="https://linkedin.com/in/themorgz"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-gray-400 hover:text-blue-400 transition-colors"
+          >
+            <FaLinkedin size={24} />
+          </a>
+        </div>
+
+        {/* Footer */}
+        <div className="text-gray-500 text-sm pt-12">
+          © {new Date().getFullYear()} TheMorgz. All rights reserved.
+        </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
