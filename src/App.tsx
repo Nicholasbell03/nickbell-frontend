@@ -1,13 +1,7 @@
-import Footer from "./components/footer";
-import Hero from "./components/hero";
+import AppRoutes from './routes';
 
 function App() {
-	return (
-		<div>
-			<Hero />
-			<Footer />
-		</div>
-	);
+  return <AppRoutes />;
 }
 
 export default App;
