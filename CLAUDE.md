@@ -27,3 +27,13 @@ This is a personal portfolio website built with React 19, TypeScript, and Vite.
 - `react-icons` - Additional icons (currently using Font Awesome icons)
 
 **Component Structure:** Components live in `src/components/`. The main `App.tsx` composes the page layout from component modules.
+
+## Learning Mode
+
+The maintainer is learning React, coming from a Vue.js background. After completing any implementation:
+
+1. **Explain what was done** - Describe the React concepts, hooks, or patterns used
+2. **Explain why** - Cover the reasoning and any trade-offs considered
+3. **Vue.js parallels** - When relevant, relate React concepts to Vue equivalents (e.g., `useState` ≈ `ref()`, `useEffect` ≈ `watch`/lifecycle hooks, props/children ≈ props/slots)
+4. **Keep it digestible** - Focus on the concepts most relevant to the change, not exhaustive explanations
+5. **Provide links** - Include links (where possible) to relevant documentation or articles (React docs, blog posts, etc.) for deeper exploration
