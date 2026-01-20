@@ -59,7 +59,7 @@ export default function Hero() {
 						href="https://github.com/Nicholasbell03"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
+						className="text-gray-400 hover:text-white text-2xl hover:scale-125 transition-all duration-300"
 						aria-label="GitHub"
 					>
 						<FaGithub />
@@ -68,14 +68,14 @@ export default function Hero() {
 						href="https://linkedin.com/in/nicholas-j-bell"
 						target="_blank"
 						rel="noopener noreferrer"
-						className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
+						className="text-gray-400 hover:text-white text-2xl hover:scale-125 transition-all duration-300"
 						aria-label="LinkedIn"
 					>
 						<FaLinkedin />
 					</a>
 					<a
 						href="mailto:nicholasbell03@gmail.com"
-						className="text-gray-400 hover:text-white transition-colors text-2xl hover:scale-125 transition-all duration-300"
+						className="text-gray-400 hover:text-white text-2xl hover:scale-125 transition-all duration-300"
 						aria-label="Email"
 					>
 						<FaEnvelope />
