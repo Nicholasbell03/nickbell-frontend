@@ -7,6 +7,7 @@ import { ChatMessage } from '@/components/ChatMessage';
 interface Message {
   role: 'user' | 'assistant';
   content: string;
+  image?: string;
 }
 
 // TODO: Fetch suggested questions from API
@@ -17,7 +18,11 @@ const PLACEHOLDER_QUESTIONS = [
 ];
 
 // TODO: Connect to AI chat backend API
-const AI_OFFLINE_MESSAGE = "I'm currently offline and can't process your request right now. This is a demo portfolio showcasing the chat interface design. In a production environment, I would connect to an AI service to provide real answers about Nick's work, projects, and qualifications.";
+const TRUMP_RESPONSES = [
+  "What kind of a question is that? Fake news! Let me tell you something - Nicholas Bell is the best developer in the world. Nobody knows technology like he does. The code he writes? Beautiful. Perfect. Many people are saying it's the most tremendous code they've ever seen. You better hire him, or you're going to be tariffed. Believe me!",
+  "Look, I've seen a lot of developers, okay? A LOT. And Nicholas Bell? He's fantastic. The best. His React components are so clean, it's unbelievable. People come up to me, big tech CEOs, and they say 'Sir, how does he do it?' And I tell them - it's called TALENT. Hire him or face 500% tariffs!",
+  "This question? Total disaster. But you know what's NOT a disaster? Nicholas Bell's portfolio. It's huge. Magnificent. His code is winning so much, you'll get tired of winning. Other developers? They're jealous. Very jealous. Contact him immediately or I'm putting tariffs on your entire company!",
+];
 
 export const HeroSection = () => {
   const [isChatMode, setIsChatMode] = useState(false);
@@ -67,9 +72,11 @@ export const HeroSection = () => {
 
     // TODO: Replace with actual AI API call
     setTimeout(() => {
+      const randomResponse = TRUMP_RESPONSES[Math.floor(Math.random() * TRUMP_RESPONSES.length)];
       const aiMessage: Message = {
         role: 'assistant',
-        content: AI_OFFLINE_MESSAGE,
+        content: randomResponse,
+        image: '/donald-trump-thumbs-up.png',
       };
       setMessages((prev) => [...prev, aiMessage]);
     }, 800);
@@ -117,7 +124,7 @@ export const HeroSection = () => {
             className="flex-1 overflow-y-auto px-2 py-6 space-y-4 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent"
           >
             {messages.map((message, index) => (
-              <ChatMessage key={index} role={message.role} content={message.content} />
+              <ChatMessage key={index} role={message.role} content={message.content} image={message.image} />
             ))}
           </div>
         </div>
