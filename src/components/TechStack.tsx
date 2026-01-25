@@ -1,29 +1,47 @@
 import { Badge } from '@/components/ui/badge';
+import { Store } from 'lucide-react';
 import {
-  Code2,
-  Database,
-  Container,
-  Boxes,
-  Layers,
-  Cpu,
-  Cloud,
-  GitBranch,
-} from 'lucide-react';
+  SiLaravel,
+  SiPhp,
+  SiJavascript,
+  SiTypescript,
+  SiVuedotjs,
+  SiMysql,
+  SiPostgresql,
+  SiRedis,
+  SiVite,
+  SiHtml5,
+  SiTailwindcss,
+  SiAmazonwebservices,
+  SiDocker,
+  SiFigma,
+  SiReact,
+} from 'react-icons/si';
+import type { IconType } from 'react-icons';
+import type { LucideIcon } from 'lucide-react';
 
-// TODO: Fetch from Skills/Technologies API
-const techStack = [
-  { name: 'Laravel', icon: Code2 },
-  { name: 'React', icon: Layers },
-  { name: 'TypeScript', icon: Code2 },
-  { name: 'Supabase', icon: Database },
-  { name: 'PostgreSQL', icon: Database },
-  { name: 'Docker', icon: Container },
-  { name: 'Redis', icon: Boxes },
-  { name: 'TailwindCSS', icon: Layers },
-  { name: 'Node.js', icon: Cpu },
-  { name: 'AWS', icon: Cloud },
-  { name: 'Git', icon: GitBranch },
-  { name: 'REST APIs', icon: Code2 },
+type TechItem = {
+  name: string;
+  icon: IconType | LucideIcon;
+};
+
+const techStack: TechItem[] = [
+  { name: 'Laravel', icon: SiLaravel },
+  { name: 'PHP', icon: SiPhp },
+  { name: 'JavaScript', icon: SiJavascript },
+  { name: 'TypeScript', icon: SiTypescript },
+  { name: 'Vue.js', icon: SiVuedotjs },
+  { name: 'MySQL', icon: SiMysql },
+  { name: 'PostgreSQL', icon: SiPostgresql },
+  { name: 'Pinia', icon: Store },
+  { name: 'Redis', icon: SiRedis },
+  { name: 'Vite', icon: SiVite },
+  { name: 'HTML', icon: SiHtml5 },
+  { name: 'Tailwind', icon: SiTailwindcss },
+  { name: 'AWS', icon: SiAmazonwebservices },
+  { name: 'Docker', icon: SiDocker },
+  { name: 'Figma', icon: SiFigma },
+  { name: 'React', icon: SiReact },
 ];
 
 export function TechStack() {
