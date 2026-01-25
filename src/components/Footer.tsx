@@ -1,7 +1,6 @@
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-// TODO: Fetch social links from Profile API
 const socialLinks = [
   { name: 'GitHub', icon: Github, url: 'https://github.com/Nicholasbell03' },
   { name: 'LinkedIn', icon: Linkedin, url: 'https://linkedin.com/in/nicholas-j-bell' },

@@ -15,7 +15,6 @@ export function Navigation() {
     return location.pathname.startsWith(path);
   };
 
-  // TODO: Consider fetching navigation items from a config API (optional)
   const navItems = [
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
