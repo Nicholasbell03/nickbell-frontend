@@ -1,48 +1,42 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-
-// TODO: Fetch from Projects API (backend TBD)
-interface Project {
-  id: string;
-  title: string;
-  slug: string;
-  description: string;
-  image_url: string;
-  tech_stack: string[];
-}
-
-// TODO: Replace with API call - mock data for development
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    title: 'E-Commerce Platform',
-    slug: 'e-commerce-platform',
-    description: 'A full-featured e-commerce platform with real-time inventory management, payment processing, and admin dashboard.',
-    image_url: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&auto=format&fit=crop&q=60',
-    tech_stack: ['Laravel', 'React', 'PostgreSQL', 'Redis', 'Stripe'],
-  },
-  {
-    id: '2',
-    title: 'AI Content Generator',
-    slug: 'ai-content-generator',
-    description: 'An AI-powered content generation tool that helps marketers create engaging copy for various platforms.',
-    image_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=60',
-    tech_stack: ['Next.js', 'OpenAI', 'TypeScript', 'Tailwind'],
-  },
-  {
-    id: '3',
-    title: 'Task Management System',
-    slug: 'task-management-system',
-    description: 'A collaborative task management application with real-time updates and team workspaces.',
-    image_url: 'https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&auto=format&fit=crop&q=60',
-    tech_stack: ['Vue.js', 'Laravel', 'WebSockets', 'MySQL'],
-  },
-];
+import { ArrowRight, Loader2 } from 'lucide-react';
+import { projectApi } from '@/services/api';
+import type { ProjectSummary } from '@/types/project';
 
 export function ProjectsPreview() {
+  const [projects, setProjects] = useState<ProjectSummary[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    projectApi
+      .getFeatured()
+      .then((response) => {
+        setProjects(response.data);
+        setLoading(false);
+      })
+      .catch(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <section id="projects" className="py-16 md:py-24 px-4">
+        <div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[300px]">
+          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
+        </div>
+      </section>
+    );
+  }
+
+  if (projects.length === 0) {
+    return null;
+  }
+
   return (
     <section id="projects" className="py-16 md:py-24 px-4">
       <div className="container mx-auto max-w-7xl">
@@ -62,7 +56,7 @@ export function ProjectsPreview() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {mockProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <Link key={project.id} to={`/projects/${project.slug}`}>
               <Card
                 className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer"
@@ -70,10 +64,10 @@ export function ProjectsPreview() {
                   animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`,
                 }}
               >
-                {project.image_url && (
+                {project.featured_image && (
                   <div className="relative h-48 overflow-hidden bg-muted">
                     <img
-                      src={project.image_url}
+                      src={project.featured_image}
                       alt={project.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
@@ -88,7 +82,7 @@ export function ProjectsPreview() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex flex-wrap gap-2">
-                    {project.tech_stack.slice(0, 4).map((tech) => (
+                    {project.technologies.slice(0, 4).map((tech) => (
                       <Badge
                         key={tech}
                         variant="secondary"
@@ -97,12 +91,12 @@ export function ProjectsPreview() {
                         {tech}
                       </Badge>
                     ))}
-                    {project.tech_stack.length > 4 && (
+                    {project.technologies.length > 4 && (
                       <Badge
                         variant="secondary"
                         className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                       >
-                        +{project.tech_stack.length - 4}
+                        +{project.technologies.length - 4}
                       </Badge>
                     )}
                   </div>
