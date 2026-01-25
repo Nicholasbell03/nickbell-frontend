@@ -2,7 +2,7 @@ import type { Blog, BlogSummary, PaginatedResponse } from "@/types/blog";
 import type { Project, ProjectSummary } from "@/types/project";
 
 const API_BASE_URL =
-	import.meta.env.VITE_API_URL || "https://nickbell-dev.onrender.com/api/v1";
+	import.meta.env.VITE_API_URL || "https://nickbell-dev.onrender.com";
 
 async function fetchApi<T>(endpoint: string): Promise<T> {
 	const response = await fetch(`${API_BASE_URL}${endpoint}`);
