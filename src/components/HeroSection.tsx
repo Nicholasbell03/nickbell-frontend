@@ -10,7 +10,6 @@ interface Message {
   image?: string;
 }
 
-// TODO: Fetch suggested questions from API
 const PLACEHOLDER_QUESTIONS = [
   "What's Nick's latest blog post about?",
   "What qualifications does Nick have?",
