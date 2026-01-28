@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Calendar, Clock, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { blogApi } from '@/services/api';
+import { blogApi, getPreviewToken } from '@/services/api';
 import type { Blog } from '@/types/blog';
 
 export function BlogPostDetailPage() {
@@ -12,6 +12,7 @@ export function BlogPostDetailPage() {
   const [post, setPost] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(!!slug);
   const [error, setError] = useState<string | null>(null);
+  const previewToken = getPreviewToken();
 
   useEffect(() => {
     if (!slug) {
@@ -21,7 +22,7 @@ export function BlogPostDetailPage() {
     let cancelled = false;
 
     blogApi
-      .getBySlug(slug)
+      .getBySlug(slug, previewToken)
       .then((response) => {
         if (!cancelled) {
           setPost(response.data);
@@ -38,7 +39,7 @@ export function BlogPostDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, previewToken]);
 
   if (loading) {
     return (
@@ -88,7 +89,13 @@ export function BlogPostDetailPage() {
 
   return (
     <div className="py-16 md:py-24 px-4">
-      <div className="container mx-auto max-w-4xl">
+      {previewToken && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 py-2 px-4 text-center font-medium">
+          <Eye className="inline-block h-4 w-4 mr-2" />
+          Preview Mode — This content is not published
+        </div>
+      )}
+      <div className={`container mx-auto max-w-4xl ${previewToken ? 'mt-8' : ''}`}>
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
