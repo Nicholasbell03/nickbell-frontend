@@ -123,11 +123,10 @@ export function BlogPostDetailPage() {
           </div>
 
           <div className="border-t border-emerald-500/20 pt-8">
-            <div className="prose prose-invert prose-lg max-w-none">
-              <div className="text-lg leading-relaxed whitespace-pre-wrap">
-                {post.content}
-              </div>
-            </div>
+            <div
+              className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
+              dangerouslySetInnerHTML={{ __html: post.content }}
+            />
           </div>
 
           <div className="border-t border-emerald-500/20 pt-8 flex justify-between">

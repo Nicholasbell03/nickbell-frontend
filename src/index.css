@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
 
 /*
  * Theme configuration using Tailwind v4's @theme directive
