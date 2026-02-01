@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -13,6 +14,14 @@ export function BlogPostDetailPage() {
   const [loading, setLoading] = useState(!!slug);
   const [error, setError] = useState<string | null>(null);
   const previewToken = getPreviewToken();
+
+  const sanitizedContent = useMemo(
+    () => post?.content ? DOMPurify.sanitize(post.content, {
+      ADD_TAGS: ['svg', 'path', 'line', 'rect', 'polygon', 'text', 'circle', 'ellipse', 'g', 'defs', 'clipPath', 'use'],
+      ADD_ATTR: ['viewBox', 'xmlns', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'd', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'text-anchor', 'font-size', 'font-weight', 'points', 'transform', 'clip-path'],
+    }) : '',
+    [post?.content],
+  );
 
   useEffect(() => {
     if (!slug) {
@@ -123,11 +132,10 @@ export function BlogPostDetailPage() {
           </div>
 
           <div className="border-t border-emerald-500/20 pt-8">
-            <div className="prose prose-invert prose-lg max-w-none">
-              <div className="text-lg leading-relaxed whitespace-pre-wrap">
-                {post.content}
-              </div>
-            </div>
+            <div
+              className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+            />
           </div>
 
           <div className="border-t border-emerald-500/20 pt-8 flex justify-between">
