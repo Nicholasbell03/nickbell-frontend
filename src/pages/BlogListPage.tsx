@@ -70,6 +70,7 @@ export function BlogListPage() {
                       <img
                         src={post.featured_image}
                         alt={post.title}
+                        loading="lazy"
                         className="w-full h-48 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
                       />
                     ) : (
