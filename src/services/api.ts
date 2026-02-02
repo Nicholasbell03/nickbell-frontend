@@ -4,8 +4,13 @@ import type { Project, ProjectSummary } from "@/types/project";
 const API_BASE_URL =
 	import.meta.env.VITE_API_URL || "https://nickbell-dev.onrender.com";
 
-async function fetchApi<T>(endpoint: string): Promise<T> {
-	const response = await fetch(`${API_BASE_URL}${endpoint}`);
+async function fetchApi<T>(
+	endpoint: string,
+	headers?: Record<string, string>,
+): Promise<T> {
+	const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+		headers,
+	});
 
 	if (!response.ok) {
 		throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -19,7 +24,7 @@ async function fetchApi<T>(endpoint: string): Promise<T> {
  */
 export function getPreviewToken(): string | null {
 	const params = new URLSearchParams(window.location.search);
-	return params.get("preview");
+	return params.get("token");
 }
 
 export const blogApi = {
@@ -38,9 +43,9 @@ export const blogApi = {
 		previewToken?: string | null,
 	): Promise<{ data: Blog }> {
 		if (previewToken) {
-			return fetchApi<{ data: Blog }>(
-				`/api/v1/blogs/preview/${slug}?token=${previewToken}`,
-			);
+			return fetchApi<{ data: Blog }>(`/api/v1/blogs/preview/${slug}`, {
+				"X-Preview-Token": previewToken,
+			});
 		}
 		return fetchApi<{ data: Blog }>(`/api/v1/blogs/${slug}`);
 	},
@@ -64,9 +69,9 @@ export const projectApi = {
 		previewToken?: string | null,
 	): Promise<{ data: Project }> {
 		if (previewToken) {
-			return fetchApi<{ data: Project }>(
-				`/api/v1/projects/preview/${slug}?token=${previewToken}`,
-			);
+			return fetchApi<{ data: Project }>(`/api/v1/projects/preview/${slug}`, {
+				"X-Preview-Token": previewToken,
+			});
 		}
 		return fetchApi<{ data: Project }>(`/api/v1/projects/${slug}`);
 	},
