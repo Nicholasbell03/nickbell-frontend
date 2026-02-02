@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Clock, ArrowRight, Loader2 } from 'lucide-react';
+import { Card, CardDescription, CardTitle } from '@/components/ui/card';
+import { Calendar, Clock, ArrowRight, Loader2, FileText } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { blogApi } from '@/services/api';
 import type { BlogSummary } from '@/types/blog';
@@ -55,37 +55,52 @@ export function BlogListPage() {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-6">
           {posts.map((post, index) => (
             <Link key={post.id} to={`/blog/${post.slug}`}>
               <Card
-                className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 flex flex-col h-full cursor-pointer"
+                className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 cursor-pointer"
                 style={{
                   animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`,
                 }}
               >
-                <CardHeader>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground mb-2">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {formatDistanceToNow(new Date(post.published_at), { addSuffix: true })}
+                <div className="flex flex-col md:flex-row">
+                  <div className="md:w-64 lg:w-80 shrink-0">
+                    {post.featured_image ? (
+                      <img
+                        src={post.featured_image}
+                        alt={post.title}
+                        loading="lazy"
+                        className="w-full h-48 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+                      />
+                    ) : (
+                      <div className="w-full h-48 md:h-full min-h-[160px] bg-slate-800/50 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex flex-col items-center justify-center gap-3 border-r border-emerald-500/10">
+                        <FileText className="h-10 w-10 text-emerald-500/40" />
+                        <span className="text-xs text-muted-foreground/50 uppercase tracking-widest">Article</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-col flex-1 p-6">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {formatDistanceToNow(new Date(post.published_at), { addSuffix: true })}
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {post.read_time} min
+                      </div>
                     </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-4 w-4" />
-                      {post.read_time} min
+                    <CardTitle className="group-hover:text-emerald-400 transition-colors mb-2">
+                      {post.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-3 mb-4">{post.excerpt}</CardDescription>
+                    <div className="mt-auto text-sm text-emerald-400 group-hover:text-emerald-300 flex items-center gap-2">
+                      Read More
+                      <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
-                  <CardTitle className="group-hover:text-emerald-400 transition-colors">
-                    {post.title}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3">{post.excerpt}</CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto">
-                  <div className="text-sm text-emerald-400 group-hover:text-emerald-300 flex items-center gap-2">
-                    Read More
-                    <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </CardContent>
+                </div>
               </Card>
             </Link>
           ))}
