@@ -1,29 +1,15 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Loader2 } from 'lucide-react';
-import { projectApi } from '@/services/api';
-import type { ProjectSummary } from '@/types/project';
+import { useFeaturedProjects } from '@/hooks/useQueries';
 
 export function ProjectsPreview() {
-  const [projects, setProjects] = useState<ProjectSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useFeaturedProjects();
+  const projects = data?.data ?? [];
 
-  useEffect(() => {
-    projectApi
-      .getFeatured()
-      .then((response) => {
-        setProjects(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section id="projects" className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[300px]">

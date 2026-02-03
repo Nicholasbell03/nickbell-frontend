@@ -1,30 +1,14 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
-import { projectApi } from '@/services/api';
-import type { ProjectSummary } from '@/types/project';
+import { useProjects } from '@/hooks/useQueries';
 
 export function ProjectsListPage() {
-  const [projects, setProjects] = useState<ProjectSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useProjects();
+  const projects = data?.data ?? [];
 
-  useEffect(() => {
-    projectApi
-      .getAll()
-      .then((response) => {
-        setProjects(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[400px]">
@@ -39,7 +23,7 @@ export function ProjectsListPage() {
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-7xl text-center space-y-4">
           <h1 className="text-2xl font-bold text-red-400">Failed to load projects</h1>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{error.message}</p>
         </div>
       </div>
     );

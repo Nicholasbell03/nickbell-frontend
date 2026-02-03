@@ -1,0 +1,16 @@
+[build]
+  publish = "dist"
+  command = "yarn build"
+
+# Redirect admin to Laravel backend using env var
+[[redirects]]
+  from = "/admin/*"
+  to = "${VITE_API_URL}/admin/:splat"
+  status = 301
+  force = true
+
+# SPA fallback (must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -1,5 +1,0 @@
-# Redirect admin to Laravel backend
-/admin/* https://nickbell-dev.onrender.com/admin/:splat 301
-
-# SPA fallback (must be last)
-/* /index.html 200

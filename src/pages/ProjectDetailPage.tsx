@@ -1,47 +1,18 @@
-import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ExternalLink, Github, Loader2, Eye } from 'lucide-react';
-import { projectApi, getPreviewToken } from '@/services/api';
-import type { Project } from '@/types/project';
+import { getPreviewToken } from '@/services/api';
+import { useProject } from '@/hooks/useQueries';
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(!!slug);
-  const [error, setError] = useState<string | null>(null);
   const previewToken = getPreviewToken();
+  const { data, isLoading, error } = useProject(slug, previewToken);
+  const project = data?.data ?? null;
 
-  useEffect(() => {
-    if (!slug) {
-      return;
-    }
-
-    let cancelled = false;
-
-    projectApi
-      .getBySlug(slug, previewToken)
-      .then((response) => {
-        if (!cancelled) {
-          setProject(response.data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [slug, previewToken]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-4xl flex justify-center items-center min-h-[400px]">
@@ -56,7 +27,7 @@ export function ProjectDetailPage() {
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center space-y-4">
           <h1 className="text-2xl font-bold text-red-400">Failed to load project</h1>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{error.message}</p>
           <Link to="/projects">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />

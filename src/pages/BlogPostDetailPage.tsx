@@ -1,56 +1,28 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
-import { blogApi, getPreviewToken } from '@/services/api';
-import type { Blog } from '@/types/blog';
+import { getPreviewToken } from '@/services/api';
+import { useBlog } from '@/hooks/useQueries';
 
 export function BlogPostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
-  const [post, setPost] = useState<Blog | null>(null);
-  const [loading, setLoading] = useState(!!slug);
-  const [error, setError] = useState<string | null>(null);
   const previewToken = getPreviewToken();
+  const { data, isLoading, error } = useBlog(slug, previewToken);
+  const post = data?.data ?? null;
 
   const sanitizedContent = useMemo(
     () => post?.content ? DOMPurify.sanitize(post.content, {
       ADD_TAGS: ['svg', 'path', 'line', 'rect', 'polygon', 'text', 'circle', 'ellipse', 'g', 'defs', 'clipPath', 'use'],
       ADD_ATTR: ['viewBox', 'xmlns', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'd', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'text-anchor', 'font-size', 'font-weight', 'points', 'transform', 'clip-path'],
     }) : '',
-    [post?.content],
+    [post],
   );
 
-  useEffect(() => {
-    if (!slug) {
-      return;
-    }
-
-    let cancelled = false;
-
-    blogApi
-      .getBySlug(slug, previewToken)
-      .then((response) => {
-        if (!cancelled) {
-          setPost(response.data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [slug, previewToken]);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-4xl flex justify-center items-center min-h-[400px]">
@@ -65,7 +37,7 @@ export function BlogPostDetailPage() {
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center space-y-4">
           <h1 className="text-2xl font-bold text-red-400">Failed to load post</h1>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{error.message}</p>
           <Link to="/blog">
             <Button>
               <ArrowLeft className="mr-2 h-4 w-4" />
