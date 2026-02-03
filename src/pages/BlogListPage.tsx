@@ -1,30 +1,14 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Calendar, Clock, ArrowRight, Loader2, FileText } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { blogApi } from '@/services/api';
-import type { BlogSummary } from '@/types/blog';
+import { useBlogs } from '@/hooks/useQueries';
 
 export function BlogListPage() {
-  const [posts, setPosts] = useState<BlogSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useBlogs();
+  const posts = data?.data ?? [];
 
-  useEffect(() => {
-    blogApi
-      .getAll()
-      .then((response) => {
-        setPosts(response.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[400px]">
@@ -39,7 +23,7 @@ export function BlogListPage() {
       <div className="py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-7xl text-center space-y-4">
           <h1 className="text-2xl font-bold text-red-400">Failed to load posts</h1>
-          <p className="text-muted-foreground">{error}</p>
+          <p className="text-muted-foreground">{error.message}</p>
         </div>
       </div>
     );

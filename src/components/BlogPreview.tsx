@@ -1,29 +1,15 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, Clock, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { blogApi } from '@/services/api';
-import type { BlogSummary } from '@/types/blog';
+import { useFeaturedBlogs } from '@/hooks/useQueries';
 
 export function BlogPreview() {
-  const [posts, setPosts] = useState<BlogSummary[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, isLoading } = useFeaturedBlogs();
+  const posts = data?.data ?? [];
 
-  useEffect(() => {
-    blogApi
-      .getFeatured()
-      .then((response) => {
-        setPosts(response.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) {
+  if (isLoading) {
     return (
       <section className="py-16 md:py-24 px-4 bg-background/50">
         <div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[300px]">
