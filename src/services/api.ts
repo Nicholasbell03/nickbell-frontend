@@ -1,5 +1,6 @@
 import type { Blog, BlogSummary, PaginatedResponse } from "@/types/blog";
 import type { Project, ProjectSummary } from "@/types/project";
+import type { Share, ShareSummary } from "@/types/share";
 
 const API_BASE_URL =
 	import.meta.env.VITE_API_URL || "https://api.nickbell.dev";
@@ -74,5 +75,21 @@ export const projectApi = {
 			});
 		}
 		return fetchApi<{ data: Project }>(`/api/v1/projects/${slug}`);
+	},
+};
+
+export const shareApi = {
+	async getAll(page = 1): Promise<PaginatedResponse<ShareSummary>> {
+		return fetchApi<PaginatedResponse<ShareSummary>>(
+			`/api/v1/shares?page=${page}`,
+		);
+	},
+
+	async getFeatured(): Promise<{ data: ShareSummary[] }> {
+		return fetchApi<{ data: ShareSummary[] }>("/api/v1/shares/featured");
+	},
+
+	async getBySlug(slug: string): Promise<{ data: Share }> {
+		return fetchApi<{ data: Share }>(`/api/v1/shares/${slug}`);
 	},
 };

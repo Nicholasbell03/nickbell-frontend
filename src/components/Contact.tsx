@@ -16,7 +16,7 @@ export function Contact() {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
+				<Button className="bg-emerald-500 hover:bg-emerald-600 text-white ml-2">
 					Contact Me
 					<ChevronDown className="ml-2 h-4 w-4" />
 				</Button>

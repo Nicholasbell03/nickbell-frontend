@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { blogApi, projectApi } from '@/services/api';
+import { blogApi, projectApi, shareApi } from '@/services/api';
 
 /**
  * Query keys for cache management.
@@ -23,6 +23,14 @@ export const queryKeys = {
     details: () => [...queryKeys.projects.all, 'detail'] as const,
     detail: (slug: string) => [...queryKeys.projects.details(), slug] as const,
     preview: (slug: string) => [...queryKeys.projects.all, 'preview', slug] as const,
+  },
+  shares: {
+    all: ['shares'] as const,
+    lists: () => [...queryKeys.shares.all, 'list'] as const,
+    list: (page: number) => [...queryKeys.shares.lists(), page] as const,
+    featured: () => [...queryKeys.shares.all, 'featured'] as const,
+    details: () => [...queryKeys.shares.all, 'detail'] as const,
+    detail: (slug: string) => [...queryKeys.shares.details(), slug] as const,
   },
 };
 
@@ -95,5 +103,39 @@ export function useProject(slug: string | undefined, previewToken?: string | nul
     queryFn: () => projectApi.getBySlug(slug!, previewToken),
     enabled: !!slug,
     staleTime: previewToken ? 0 : 60 * 60 * 1000, // No cache for preview, 1 hour for published
+  });
+}
+
+/**
+ * Fetch all shares with pagination
+ */
+export function useShares(page = 1) {
+  return useQuery({
+    queryKey: queryKeys.shares.list(page),
+    queryFn: () => shareApi.getAll(page),
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+/**
+ * Fetch featured shares for homepage
+ */
+export function useFeaturedShares() {
+  return useQuery({
+    queryKey: queryKeys.shares.featured(),
+    queryFn: () => shareApi.getFeatured(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Fetch a single share by slug
+ */
+export function useShare(slug: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.shares.detail(slug!),
+    queryFn: () => shareApi.getBySlug(slug!),
+    enabled: !!slug,
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 }

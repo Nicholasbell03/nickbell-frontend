@@ -7,6 +7,8 @@ const ProjectsListPage = lazy(() => import('@/pages/ProjectsListPage').then(m =>
 const ProjectDetailPage = lazy(() => import('@/pages/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
 const BlogListPage = lazy(() => import('@/pages/BlogListPage').then(m => ({ default: m.BlogListPage })));
 const BlogPostDetailPage = lazy(() => import('@/pages/BlogPostDetailPage').then(m => ({ default: m.BlogPostDetailPage })));
+const SharesListPage = lazy(() => import('@/pages/SharesListPage').then(m => ({ default: m.SharesListPage })));
+const ShareDetailPage = lazy(() => import('@/pages/ShareDetailPage').then(m => ({ default: m.ShareDetailPage })));
 
 function LoadingFallback() {
   return (
@@ -57,6 +59,22 @@ export default function AppRoutes() {
           element={
             <Suspense fallback={<LoadingFallback />}>
               <BlogPostDetailPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="shares"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <SharesListPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="shares/:slug"
+          element={
+            <Suspense fallback={<LoadingFallback />}>
+              <ShareDetailPage />
             </Suspense>
           }
         />
