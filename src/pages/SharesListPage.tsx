@@ -7,6 +7,17 @@ import { formatDistanceToNow } from 'date-fns';
 import { useShares } from '@/hooks/useQueries';
 import type { SourceType } from '@/types/share';
 
+function SourceBadgeIcon({ type, className }: { type: SourceType; className?: string }) {
+  switch (type) {
+    case 'youtube':
+      return <FaYoutube className={className} />;
+    case 'x_post':
+      return <FaXTwitter className={className} />;
+    default:
+      return <Globe className={className} />;
+  }
+}
+
 function SourceBadge({ type }: { type: SourceType }) {
   const config = {
     webpage: { label: 'Web', icon: Globe },
@@ -68,17 +79,21 @@ export function SharesListPage() {
                   animation: `fadeIn 0.5s ease-out ${index * 0.05}s both`,
                 }}
               >
-                {share.image_url && (
-                  <div className="relative h-40 overflow-hidden bg-muted">
+                <div className="relative h-40 overflow-hidden bg-muted">
+                  {share.image_url ? (
                     <img
                       src={share.image_url}
                       alt={share.title ?? ''}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                  </div>
-                )}
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
+                      <SourceBadgeIcon type={share.source_type} className="h-14 w-14 text-emerald-800" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                </div>
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-2 mb-3">
                     <SourceBadge type={share.source_type} />
