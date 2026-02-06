@@ -19,6 +19,7 @@ export function Navigation() {
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
     { name: 'Blog', path: '/blog' },
+    { name: 'Shares', path: '/shares' },
   ];
 
   return (
