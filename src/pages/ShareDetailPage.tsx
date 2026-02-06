@@ -7,6 +7,7 @@ import { FaYoutube, FaXTwitter } from 'react-icons/fa6';
 import { format } from 'date-fns';
 import { useShare } from '@/hooks/useQueries';
 import type { SourceType } from '@/types/share';
+import { safeHostname } from '@/lib/utils';
 
 function SourceIcon({ type, className }: { type: SourceType; className?: string }) {
   switch (type) {
@@ -97,7 +98,7 @@ export function ShareDetailPage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-              {share.title ?? new URL(share.url).hostname}
+              {share.title ?? safeHostname(share.url)}
             </h1>
             {share.description && (
               <p className="text-xl text-muted-foreground">{share.description}</p>

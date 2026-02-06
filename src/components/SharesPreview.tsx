@@ -12,6 +12,7 @@ import { FaYoutube, FaXTwitter } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
 import { useFeaturedShares } from "@/hooks/useQueries";
 import type { SourceType } from "@/types/share";
+import { safeHostname } from "@/lib/utils";
 
 function SourceIcon({
 	type,
@@ -115,8 +116,7 @@ export function SharesPreview() {
 										</span>
 									</div>
 									<CardTitle className="text-lg group-hover:text-emerald-400 transition-colors">
-										{share.title ??
-											new URL(share.url).hostname}
+										{share.title ?? safeHostname(share.url)}
 									</CardTitle>
 									{share.description && (
 										<CardDescription className="line-clamp-2">
