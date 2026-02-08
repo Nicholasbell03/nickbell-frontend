@@ -12,7 +12,7 @@ import { FaYoutube, FaXTwitter } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
 import { useFeaturedShares } from "@/hooks/useQueries";
 import type { SourceType } from "@/types/share";
-import { safeHostname } from "@/lib/utils";
+import { safeHostname, stripHtml } from "@/lib/utils";
 
 function SourceIcon({
 	type,
@@ -120,7 +120,7 @@ export function SharesPreview() {
 									</CardTitle>
 									{share.commentary && (
 										<CardDescription className="line-clamp-2">
-											{share.commentary.replace(/<[^>]*>/g, '')}
+											{stripHtml(share.commentary)}
 										</CardDescription>
 									)}
 								</CardHeader>
