@@ -75,7 +75,7 @@ export function SharesListPage() {
           {shares.map((share, index) => (
             <Link key={share.id} to={`/shares/${share.slug}`}>
               <Card
-                className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer"
+                className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer flex flex-col"
                 style={{
                   animation: `fadeIn 0.5s ease-out ${index * 0.05}s both`,
                 }}
@@ -98,15 +98,15 @@ export function SharesListPage() {
                 <div className="p-6 flex flex-col flex-1">
                   <div className="flex items-center gap-2 mb-3">
                     <SourceBadge type={share.source_type} />
-                    {share.site_name && (
-                      <span className="text-sm text-muted-foreground">{share.site_name}</span>
+                    {share.author && (
+                      <span className="text-sm text-muted-foreground">{share.author}</span>
                     )}
                   </div>
                   <CardTitle className="text-lg group-hover:text-emerald-400 transition-colors mb-2">
                     {share.title ?? safeHostname(share.url)}
                   </CardTitle>
-                  {share.description && (
-                    <CardDescription className="line-clamp-3 mb-4">{share.description}</CardDescription>
+                  {share.commentary && (
+                    <CardDescription className="line-clamp-3 mb-4">{share.commentary.replace(/<[^>]*>/g, '')}</CardDescription>
                   )}
                   <div className="mt-auto flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">

@@ -76,7 +76,7 @@ export function SharesPreview() {
 					{shares.map((share, index) => (
 						<Link key={share.id} to={`/shares/${share.slug}`}>
 							<Card
-								className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer"
+								className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer flex flex-col"
 								style={{
 									animation: `fadeIn 0.5s ease-out ${index * 0.1}s both`,
 								}}
@@ -105,8 +105,8 @@ export function SharesPreview() {
 											type={share.source_type}
 											className="h-4 w-4 text-emerald-400"
 										/>
-										{share.site_name && (
-											<span>{share.site_name}</span>
+										{share.author && (
+											<span>{share.author}</span>
 										)}
 										<span className="ml-auto">
 											{formatDistanceToNow(
@@ -118,9 +118,9 @@ export function SharesPreview() {
 									<CardTitle className="text-lg group-hover:text-emerald-400 transition-colors">
 										{share.title ?? safeHostname(share.url)}
 									</CardTitle>
-									{share.description && (
+									{share.commentary && (
 										<CardDescription className="line-clamp-2">
-											{share.description}
+											{share.commentary.replace(/<[^>]*>/g, '')}
 										</CardDescription>
 									)}
 								</CardHeader>
