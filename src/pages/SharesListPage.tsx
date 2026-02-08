@@ -6,7 +6,7 @@ import { FaYoutube, FaXTwitter } from 'react-icons/fa6';
 import { formatDistanceToNow } from 'date-fns';
 import { useShares } from '@/hooks/useQueries';
 import type { SourceType } from '@/types/share';
-import { safeHostname } from '@/lib/utils';
+import { safeHostname, stripHtml } from '@/lib/utils';
 
 function SourceBadgeIcon({ type, className }: { type: SourceType; className?: string }) {
   switch (type) {
@@ -106,7 +106,7 @@ export function SharesListPage() {
                     {share.title ?? safeHostname(share.url)}
                   </CardTitle>
                   {share.commentary && (
-                    <CardDescription className="line-clamp-3 mb-4">{share.commentary.replace(/<[^>]*>/g, '')}</CardDescription>
+                    <CardDescription className="line-clamp-3 mb-4">{stripHtml(share.commentary)}</CardDescription>
                   )}
                   <div className="mt-auto flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
