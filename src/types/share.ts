@@ -9,11 +9,12 @@ export interface ShareSummary {
   description: string | null;
   image_url: string | null;
   site_name: string | null;
+  author: string | null;
+  commentary: string | null;
   created_at: string;
 }
 
 export interface Share extends ShareSummary {
-  commentary: string | null;
   embed_data: {
     video_id?: string;
     tweet_id?: string;

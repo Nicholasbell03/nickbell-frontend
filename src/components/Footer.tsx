@@ -15,7 +15,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <p className="text-muted-foreground">
-              &copy; {new Date().getFullYear()} Nicholas Bell. Built with React & TypeScript.
+              &copy; {new Date().getFullYear()} Nicholas Bell. Powered by Laravel & React.
             </p>
           </div>
 

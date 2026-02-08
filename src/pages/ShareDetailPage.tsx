@@ -100,10 +100,18 @@ export function ShareDetailPage() {
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">
               {share.title ?? safeHostname(share.url)}
             </h1>
-            {share.description && (
-              <p className="text-xl text-muted-foreground">{share.description}</p>
-            )}
           </div>
+
+          {/* Commentary */}
+          {sanitizedCommentary && (
+            <div className="border-t border-emerald-500/20 pt-8">
+              <h2 className="text-lg font-semibold mb-4 text-emerald-400">My Thoughts</h2>
+              <div
+                className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground"
+                dangerouslySetInnerHTML={{ __html: sanitizedCommentary }}
+              />
+            </div>
+          )}
 
           {/* Source-specific embed */}
           {share.source_type === 'youtube' && share.embed_data?.video_id && (
@@ -133,15 +141,8 @@ export function ShareDetailPage() {
             </a>
           )}
 
-          {/* Commentary */}
-          {sanitizedCommentary && (
-            <div className="border-t border-emerald-500/20 pt-8">
-              <h2 className="text-lg font-semibold mb-4 text-emerald-400">My Thoughts</h2>
-              <div
-                className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground"
-                dangerouslySetInnerHTML={{ __html: sanitizedCommentary }}
-              />
-            </div>
+          {share.description && (
+            <p className="text-xl text-muted-foreground">{share.description}</p>
           )}
 
           <div className="border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 justify-between">
