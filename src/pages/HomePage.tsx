@@ -9,8 +9,14 @@ export function HomePage() {
   return (
     <>
       <HeroSection />
-      <TechStack />
-      <GitHubActivity />
+      <section className="py-16 md:py-24 px-4">
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid md:grid-cols-3 gap-6">
+            <GitHubActivity />
+            <TechStack />
+          </div>
+        </div>
+      </section>
       <ProjectsPreview />
       <BlogPreview />
       <SharesPreview />
