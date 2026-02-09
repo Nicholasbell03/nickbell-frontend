@@ -4,11 +4,9 @@ export interface DailyContribution {
 }
 
 export interface GitHubStats {
+  total_last_7_days: number;
   total_last_30_days: number;
-  total_last_90_days: number;
   current_streak: number;
-  longest_streak: number;
-  average_per_day: number;
 }
 
 export interface GitHubActivity {

@@ -38,7 +38,7 @@ export function GitHubActivity() {
         <div className="space-y-2 mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">GitHub Activity</h2>
           <p className="text-muted-foreground text-lg">
-            Contribution activity over the last 90 days
+            Contribution activity over the last 30 days
           </p>
         </div>
 
@@ -46,22 +46,18 @@ export function GitHubActivity() {
           <CardContent className="pt-6 space-y-6">
             <ContributionSparkline data={activity.daily_contributions} />
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
+              <StatItem
+                label="Last 7 Days"
+                value={stats.total_last_7_days.toLocaleString()}
+              />
               <StatItem
                 label="Last 30 Days"
                 value={stats.total_last_30_days.toLocaleString()}
               />
               <StatItem
-                label="Current Streak"
+                label="Streak"
                 value={`${stats.current_streak}d`}
-              />
-              <StatItem
-                label="Last 90 Days"
-                value={stats.total_last_90_days.toLocaleString()}
-              />
-              <StatItem
-                label="Avg / Day"
-                value={stats.average_per_day.toFixed(1)}
               />
             </div>
           </CardContent>
