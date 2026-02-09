@@ -14,8 +14,10 @@ export function ContributionSparkline({ data, animate = false, className = '' }:
   const last7 = data.slice(-7);
   if (last7.length === 0) return null;
 
-  const maxCount = Math.max(...last7.map((d) => d.count), 1);
-  const midCount = Math.round(maxCount / 2);
+  const rawMax = Math.max(...last7.map((d) => d.count));
+  const allZero = rawMax === 0;
+  const maxCount = allZero ? 0 : rawMax;
+  const midCount = allZero ? 0 : Math.round(maxCount / 2);
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
@@ -27,9 +29,11 @@ export function ContributionSparkline({ data, animate = false, className = '' }:
         </div>
         <div className="flex items-end gap-2 h-28 flex-1">
           {last7.map((day, index) => {
-            const heightPercent = day.count > 0
-              ? Math.max((day.count / maxCount) * 100, 8)
-              : 4;
+            const heightPercent = allZero
+              ? 4
+              : day.count > 0
+                ? Math.max((day.count / maxCount) * 100, 8)
+                : 4;
 
             return (
               <div
