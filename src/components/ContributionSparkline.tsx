@@ -2,10 +2,15 @@ import type { DailyContribution } from '@/types/github';
 
 interface ContributionSparklineProps {
   data: DailyContribution[];
+  animate?: boolean;
   className?: string;
 }
 
-export function ContributionSparkline({ data, className = '' }: ContributionSparklineProps) {
+const BAR_DELAY_MS = 120;
+
+export const TOTAL_BAR_ANIMATION_MS = 7 * BAR_DELAY_MS;
+
+export function ContributionSparkline({ data, animate = false, className = '' }: ContributionSparklineProps) {
   const last7 = data.slice(-7);
   if (last7.length === 0) return null;
 
@@ -21,7 +26,7 @@ export function ContributionSparkline({ data, className = '' }: ContributionSpar
           <span>0</span>
         </div>
         <div className="flex items-end gap-2 h-28 flex-1">
-          {last7.map((day) => {
+          {last7.map((day, index) => {
             const heightPercent = day.count > 0
               ? Math.max((day.count / maxCount) * 100, 8)
               : 4;
@@ -29,12 +34,15 @@ export function ContributionSparkline({ data, className = '' }: ContributionSpar
             return (
               <div
                 key={day.date}
-                className={`flex-1 rounded-sm transition-colors ${
+                className={`flex-1 rounded-sm ${
                   day.count > 0
                     ? 'bg-emerald-500/70 hover:bg-emerald-400'
                     : 'bg-emerald-500/20'
-                }`}
-                style={{ height: `${heightPercent}%` }}
+                } transition-all duration-500 ease-out`}
+                style={{
+                  height: animate ? `${heightPercent}%` : '0%',
+                  transitionDelay: `${index * BAR_DELAY_MS}ms`,
+                }}
                 title={`${day.date}: ${day.count} contribution${day.count !== 1 ? 's' : ''}`}
               />
             );

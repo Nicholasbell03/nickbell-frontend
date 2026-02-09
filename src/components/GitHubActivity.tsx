@@ -1,7 +1,11 @@
+import { useEffect, useRef, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Loader2 } from "lucide-react";
 import { useGitHubActivity } from "@/hooks/useQueries";
-import { ContributionSparkline } from "@/components/ContributionSparkline";
+import {
+	ContributionSparkline,
+	TOTAL_BAR_ANIMATION_MS,
+} from "@/components/ContributionSparkline";
 
 function StatItem({ label, value }: { label: string; value: string }) {
 	return (
@@ -15,6 +19,38 @@ function StatItem({ label, value }: { label: string; value: string }) {
 export function GitHubActivity() {
 	const { data, isLoading } = useGitHubActivity();
 	const activity = data?.data;
+
+	const ref = useRef<HTMLDivElement>(null);
+	const [isVisible, setIsVisible] = useState(false);
+	const [showStats, setShowStats] = useState(false);
+
+	useEffect(() => {
+		const el = ref.current;
+		if (!el) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setIsVisible(true);
+					observer.disconnect();
+				}
+			},
+			{ threshold: 0.3 },
+		);
+
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [activity]);
+
+	useEffect(() => {
+		if (!isVisible) return;
+
+		const timeout = setTimeout(
+			() => setShowStats(true),
+			TOTAL_BAR_ANIMATION_MS + 300,
+		);
+		return () => clearTimeout(timeout);
+	}, [isVisible]);
 
 	if (isLoading) {
 		return (
@@ -40,29 +76,36 @@ export function GitHubActivity() {
 			className="block"
 		>
 			<Card className="border-emerald-500/20 h-full transition-colors hover:border-emerald-500/40">
-				<CardContent className="p-6 h-full flex flex-col">
+				<CardContent ref={ref} className="p-6 h-full flex flex-col">
 					<h2 className="text-3xl md:text-4xl font-bold">
 						GitHub Activity
 					</h2>
 					<div className="flex-1" />
 					<div className="space-y-6">
-					<ContributionSparkline
-						data={activity.daily_contributions}
-					/>
-					<div className="grid grid-cols-3 items-center gap-4">
-						<StatItem
-							label="7 Days"
-							value={stats.total_last_7_days.toLocaleString()}
+						<ContributionSparkline
+							data={activity.daily_contributions}
+							animate={isVisible}
 						/>
-						<StatItem
-							label="30 Days"
-							value={stats.total_last_30_days.toLocaleString()}
-						/>
-						<StatItem
-							label="Streak"
-							value={`${stats.current_streak}d`}
-						/>
-					</div>
+						<div
+							className={`grid grid-cols-3 items-center gap-4 transition-opacity duration-500 ${
+								showStats
+									? "opacity-100"
+									: "opacity-0"
+							}`}
+						>
+							<StatItem
+								label="7 Days"
+								value={stats.total_last_7_days.toLocaleString()}
+							/>
+							<StatItem
+								label="30 Days"
+								value={stats.total_last_30_days.toLocaleString()}
+							/>
+							<StatItem
+								label="Streak"
+								value={`${stats.current_streak}d`}
+							/>
+						</div>
 					</div>
 				</CardContent>
 			</Card>
