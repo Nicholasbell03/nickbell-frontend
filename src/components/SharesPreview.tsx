@@ -13,6 +13,7 @@ import { formatDistanceToNow } from "date-fns";
 import { useFeaturedShares } from "@/hooks/useQueries";
 import type { SourceType } from "@/types/share";
 import { safeHostname, stripHtml } from "@/lib/utils";
+import { useFadeInOnScroll } from "@/hooks/useFadeInOnScroll";
 
 function SourceIcon({
 	type,
@@ -32,6 +33,7 @@ function SourceIcon({
 }
 
 export function SharesPreview() {
+	const [fadeInRef, fadeInClass] = useFadeInOnScroll();
 	const { data, isLoading } = useFeaturedShares();
 	const shares = data?.data ?? [];
 
@@ -51,7 +53,7 @@ export function SharesPreview() {
 
 	return (
 		<section className="py-16 md:py-24 px-4">
-			<div className="container mx-auto max-w-7xl">
+			<div ref={fadeInRef} className={`container mx-auto max-w-7xl ${fadeInClass}`}>
 				<div className="flex items-center justify-between mb-12">
 					<div className="space-y-2">
 						<h2 className="text-3xl md:text-4xl font-bold">

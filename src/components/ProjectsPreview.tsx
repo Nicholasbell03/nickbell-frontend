@@ -4,8 +4,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Loader2 } from 'lucide-react';
 import { useFeaturedProjects } from '@/hooks/useQueries';
+import { useFadeInOnScroll } from '@/hooks/useFadeInOnScroll';
 
 export function ProjectsPreview() {
+  const [fadeInRef, fadeInClass] = useFadeInOnScroll();
   const { data, isLoading } = useFeaturedProjects();
   const projects = data?.data ?? [];
 
@@ -25,7 +27,7 @@ export function ProjectsPreview() {
 
   return (
     <section id="projects" className="py-16 md:py-24 px-4">
-      <div className="container mx-auto max-w-7xl">
+      <div ref={fadeInRef} className={`container mx-auto max-w-7xl ${fadeInClass}`}>
         <div className="flex items-center justify-between mb-12">
           <div className="space-y-2">
             <h2 className="text-3xl md:text-4xl font-bold">Featured Projects</h2>
