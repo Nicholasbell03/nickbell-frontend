@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Calendar, Clock, FileText, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useFeaturedBlogs } from '@/hooks/useQueries';
+import { useFadeInOnScroll } from '@/hooks/useFadeInOnScroll';
 
 export function BlogPreview() {
+  const [fadeInRef, fadeInClass] = useFadeInOnScroll();
   const { data, isLoading } = useFeaturedBlogs();
   const posts = data?.data ?? [];
 
@@ -25,7 +27,7 @@ export function BlogPreview() {
 
   return (
     <section className="py-16 md:py-24 px-4 bg-background/50">
-      <div className="container mx-auto max-w-7xl">
+      <div ref={fadeInRef} className={`container mx-auto max-w-7xl ${fadeInClass}`}>
         <div className="flex items-center justify-between mb-12">
           <div className="space-y-2">
             <h2 className="text-3xl md:text-4xl font-bold">Latest Thoughts</h2>
