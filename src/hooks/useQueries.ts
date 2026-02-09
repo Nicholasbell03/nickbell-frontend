@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { blogApi, projectApi, shareApi } from '@/services/api';
+import { blogApi, githubApi, projectApi, shareApi } from '@/services/api';
 
 /**
  * Query keys for cache management.
@@ -31,6 +31,10 @@ export const queryKeys = {
     featured: () => [...queryKeys.shares.all, 'featured'] as const,
     details: () => [...queryKeys.shares.all, 'detail'] as const,
     detail: (slug: string) => [...queryKeys.shares.details(), slug] as const,
+  },
+  github: {
+    all: ['github'] as const,
+    activity: () => [...queryKeys.github.all, 'activity'] as const,
   },
 };
 
@@ -137,5 +141,16 @@ export function useShare(slug: string | undefined) {
     queryFn: () => shareApi.getBySlug(slug!),
     enabled: !!slug,
     staleTime: 60 * 60 * 1000, // 1 hour
+  });
+}
+
+/**
+ * Fetch GitHub contribution activity
+ */
+export function useGitHubActivity() {
+  return useQuery({
+    queryKey: queryKeys.github.activity(),
+    queryFn: () => githubApi.getActivity(),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }

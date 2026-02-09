@@ -1,4 +1,5 @@
 import type { Blog, BlogSummary, PaginatedResponse } from "@/types/blog";
+import type { GitHubActivity } from "@/types/github";
 import type { Project, ProjectSummary } from "@/types/project";
 import type { Share, ShareSummary } from "@/types/share";
 
@@ -75,6 +76,12 @@ export const projectApi = {
 			});
 		}
 		return fetchApi<{ data: Project }>(`/api/v1/projects/${slug}`);
+	},
+};
+
+export const githubApi = {
+	async getActivity(): Promise<{ data: GitHubActivity }> {
+		return fetchApi<{ data: GitHubActivity }>("/api/v1/github/activity");
 	},
 };
 
