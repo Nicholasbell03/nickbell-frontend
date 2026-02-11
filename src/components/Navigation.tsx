@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Code2, Menu, X } from "lucide-react";
 import { Contact } from "./Contact";
+import { SearchBar } from "./SearchBar";
 
 export function Navigation() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,6 +47,7 @@ export function Navigation() {
 								</Button>
 							</Link>
 						))}
+						<SearchBar />
 						<Contact />
 					</div>
 
@@ -67,6 +69,7 @@ export function Navigation() {
 			{mobileMenuOpen && (
 				<div className="md:hidden border-t border-emerald-500/20 bg-background/98">
 					<div className="container mx-auto max-w-7xl px-4 py-4 space-y-2">
+						<SearchBar mobile onNavigate={() => setMobileMenuOpen(false)} />
 						{navItems.map((item) => (
 							<Link
 								key={item.path}
