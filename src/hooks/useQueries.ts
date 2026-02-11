@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { blogApi, githubApi, projectApi, shareApi } from '@/services/api';
+import { blogApi, githubApi, projectApi, searchApi, shareApi } from '@/services/api';
+import type { SearchType } from '@/types/search';
 
 /**
  * Query keys for cache management.
@@ -35,6 +36,10 @@ export const queryKeys = {
   github: {
     all: ['github'] as const,
     activity: () => [...queryKeys.github.all, 'activity'] as const,
+  },
+  search: {
+    all: ['search'] as const,
+    query: (q: string, type: SearchType) => [...queryKeys.search.all, q, type] as const,
   },
 };
 
@@ -152,5 +157,17 @@ export function useGitHubActivity() {
     queryKey: queryKeys.github.activity(),
     queryFn: () => githubApi.getActivity(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Search across blogs, projects, and shares
+ */
+export function useSearch(query: string, type: SearchType = 'all') {
+  return useQuery({
+    queryKey: queryKeys.search.query(query, type),
+    queryFn: () => searchApi.search(query, type),
+    enabled: query.length >= 2,
+    staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }

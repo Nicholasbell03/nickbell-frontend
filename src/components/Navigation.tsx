@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Code2, Menu, X } from "lucide-react";
 import { Contact } from "./Contact";
+import { SearchBar } from "./SearchBar";
 
 export function Navigation() {
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,7 +17,6 @@ export function Navigation() {
 	};
 
 	const navItems = [
-		{ name: "Home", path: "/" },
 		{ name: "Projects", path: "/projects" },
 		{ name: "Blog", path: "/blog" },
 		{ name: "Shares", path: "/shares" },
@@ -25,13 +25,20 @@ export function Navigation() {
 	return (
 		<nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-emerald-500/20">
 			<div className="container mx-auto max-w-7xl px-4">
-				<div className="flex items-center justify-between h-16">
-					<Link to="/" className="flex items-center gap-2 group">
+				<div className="flex items-center h-16 gap-1">
+					<Link
+						to="/"
+						className={`flex items-center gap-2 group shrink-0 rounded-md px-2 py-1 transition-colors ${
+							isActive("/")
+								? "bg-emerald-500/10"
+								: "hover:bg-emerald-500/5"
+						}`}
+					>
 						<Code2 className="h-6 w-6 text-emerald-400 group-hover:rotate-180 transition-transform duration-300" />
 						<span className="font-bold text-lg">Nick</span>
 					</Link>
 
-					<div className="hidden md:flex items-center gap-1">
+					<div className="hidden md:flex items-center gap-1 ml-3">
 						{navItems.map((item) => (
 							<Link key={item.path} to={item.path}>
 								<Button
@@ -46,13 +53,20 @@ export function Navigation() {
 								</Button>
 							</Link>
 						))}
+					</div>
+
+					<div className="hidden md:flex flex-1" />
+
+					<div className="hidden md:flex items-center gap-4 md:gap-6 shrink-0">
+						<SearchBar />
 						<Contact />
 					</div>
 
+					<div className="flex-1 md:hidden" />
 					<Button
 						variant="ghost"
 						size="icon"
-						className="md:hidden"
+						className="md:hidden shrink-0"
 						onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
 					>
 						{mobileMenuOpen ? (
@@ -67,6 +81,10 @@ export function Navigation() {
 			{mobileMenuOpen && (
 				<div className="md:hidden border-t border-emerald-500/20 bg-background/98">
 					<div className="container mx-auto max-w-7xl px-4 py-4 space-y-2">
+						<SearchBar
+							mobile
+							onNavigate={() => setMobileMenuOpen(false)}
+						/>
 						{navItems.map((item) => (
 							<Link
 								key={item.path}

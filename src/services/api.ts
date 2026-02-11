@@ -1,6 +1,7 @@
 import type { Blog, BlogSummary, PaginatedResponse } from "@/types/blog";
 import type { GitHubActivity } from "@/types/github";
 import type { Project, ProjectSummary } from "@/types/project";
+import type { SearchResults, SearchType } from "@/types/search";
 import type { Share, ShareSummary } from "@/types/share";
 
 const API_BASE_URL =
@@ -98,5 +99,17 @@ export const shareApi = {
 
 	async getBySlug(slug: string): Promise<{ data: Share }> {
 		return fetchApi<{ data: Share }>(`/api/v1/shares/${slug}`);
+	},
+};
+
+export const searchApi = {
+	async search(
+		query: string,
+		type: SearchType = "all",
+	): Promise<{ data: SearchResults }> {
+		const params = new URLSearchParams({ q: query, type });
+		return fetchApi<{ data: SearchResults }>(
+			`/api/v1/search?${params.toString()}`,
+		);
 	},
 };
