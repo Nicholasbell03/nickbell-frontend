@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Search, X, FileText, FolderGit2, Share2 } from "lucide-react";
+import { Search, X, FileText, Briefcase, Share2 } from "lucide-react";
 import { useSearch } from "@/hooks/useQueries";
 import { cn } from "@/lib/utils";
 import type { SearchType } from "@/types/search";
@@ -42,7 +42,7 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const { data, isLoading } = useSearch(debouncedQuery, activeTab);
+	const { data, isLoading } = useSearch(debouncedQuery, "all");
 	const results = data?.data;
 
 	const close = useCallback(() => {
@@ -168,32 +168,26 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 		);
 	}
 
-	// Desktop: icon button that expands to input
+	// Desktop: always-expanded search input
 	return (
-		<div ref={containerRef} className="relative">
-			{!isOpen ? (
-				<button
-					onClick={open}
-					type="button"
-					className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/5 transition-colors"
-					title="Search (Cmd+K)"
-				>
-					<Search className="h-4 w-4" />
-					<span className="text-xs border border-emerald-500/20 rounded px-1.5 py-0.5">
-						{navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
-					</span>
-				</button>
-			) : (
-				<div className="relative">
-					<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-					<input
-						ref={inputRef}
-						type="text"
-						placeholder="Search..."
-						value={query}
-						onChange={(e) => setQuery(e.target.value)}
-						className="w-64 pl-9 pr-9 py-1.5 rounded-md bg-emerald-500/5 border border-emerald-500/20 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/40"
-					/>
+		<div ref={containerRef} className="relative w-full max-w-xs">
+			<div className="relative">
+				<Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+				<input
+					ref={inputRef}
+					type="text"
+					placeholder="Search..."
+					value={query}
+					onChange={(e) => {
+						setQuery(e.target.value);
+						if (!isOpen) open();
+					}}
+					onFocus={() => {
+						if (!isOpen) open();
+					}}
+					className="w-full pl-9 pr-9 py-1.5 rounded-md bg-emerald-500/5 border border-emerald-500/20 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/40"
+				/>
+				{query ? (
 					<button
 						onClick={close}
 						type="button"
@@ -201,8 +195,12 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 					>
 						<X className="h-4 w-4" />
 					</button>
-				</div>
-			)}
+				) : (
+					<span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground border border-emerald-500/20 rounded px-1.5 py-0.5 pointer-events-none">
+						{navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
+					</span>
+				)}
+			</div>
 			{showResults && (
 				<ResultsDropdown
 					query={query}
@@ -243,44 +241,47 @@ function ResultsDropdown({
 	getTabCount,
 	onNavigate,
 }: ResultsDropdownProps) {
-	const totalCount = getTabCount("all");
+	const visibleCount = getTabCount(activeTab);
 
 	return (
-		<div className="absolute top-full left-0 right-0 mt-2 min-w-80 rounded-lg border border-emerald-500/20 bg-background/95 backdrop-blur shadow-lg overflow-hidden z-50">
-			{/* Tabs */}
-			<div className="flex border-b border-emerald-500/20 px-2 pt-2">
-				{TABS.map((tab) => {
-					const count = getTabCount(tab.value);
-					return (
-						<button
-							key={tab.value}
-							onClick={() => onTabChange(tab.value)}
-							type="button"
-							className={cn(
-								"flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-t-md transition-colors",
-								activeTab === tab.value
-									? "bg-emerald-500/20 text-emerald-400"
-									: "text-muted-foreground hover:text-foreground hover:bg-emerald-500/5",
-							)}
-						>
-							{tab.label}
-							{results && count > 0 && (
-								<span className="bg-emerald-500/20 text-emerald-400 rounded-full px-1.5 py-0.5 text-[10px] leading-none">
-									{count}
-								</span>
-							)}
-						</button>
-					);
-				})}
+		<div className="fixed top-[4.5rem] left-0 right-0 mx-auto w-full max-w-7xl px-4 z-50 md:w-3/4">
+		<div className="rounded-lg border border-emerald-500/20 bg-background shadow-lg overflow-hidden">
+			{/* Segmented control */}
+			<div className="flex justify-end px-3 py-3 border-b border-emerald-500/20">
+				<div className="inline-flex rounded-md bg-emerald-500/5 p-0.5">
+					{TABS.map((tab) => {
+						const count = getTabCount(tab.value);
+						return (
+							<button
+								key={tab.value}
+								onClick={() => onTabChange(tab.value)}
+								type="button"
+								className={cn(
+									"flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium rounded transition-all",
+									activeTab === tab.value
+										? "bg-emerald-500/20 text-emerald-400 shadow-sm"
+										: "text-muted-foreground hover:text-foreground",
+								)}
+							>
+								{tab.label}
+								{results && count > 0 && (
+									<span className="bg-emerald-500/20 text-emerald-400 rounded-full px-1.5 py-0.5 text-[10px] leading-none">
+										{count}
+									</span>
+								)}
+							</button>
+						);
+					})}
+				</div>
 			</div>
 
 			{/* Results */}
-			<div className="max-h-80 overflow-y-auto p-2">
+			<div className="max-h-[28rem] overflow-y-auto p-2">
 				{isLoading ? (
 					<div className="space-y-2 p-2">
 						{[1, 2, 3].map((i) => (
-							<div key={i} className="animate-pulse flex gap-3 items-start">
-								<div className="h-4 w-4 bg-emerald-500/10 rounded mt-0.5" />
+							<div key={i} className="animate-pulse flex gap-3 items-center px-3 py-2">
+								<div className="h-8 w-8 bg-emerald-500/10 rounded-lg shrink-0" />
 								<div className="flex-1 space-y-1.5">
 									<div className="h-3.5 bg-emerald-500/10 rounded w-3/4" />
 									<div className="h-3 bg-emerald-500/10 rounded w-full" />
@@ -288,42 +289,56 @@ function ResultsDropdown({
 							</div>
 						))}
 					</div>
-				) : totalCount === 0 ? (
-					<p className="text-sm text-muted-foreground text-center py-6">
-						No results found for &lsquo;{query}&rsquo;
-					</p>
+				) : visibleCount === 0 ? (
+					<div className="text-center py-6 space-y-2">
+						<p className="text-sm text-muted-foreground">
+							No {activeTab === "blog" ? "blogs" : activeTab === "project" ? "projects" : activeTab === "share" ? "shares" : "results"} found for &lsquo;{query}&rsquo;
+						</p>
+						{activeTab !== "all" && getTabCount("all") > 0 && (
+							<button
+								type="button"
+								onClick={() => onTabChange("all")}
+								className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors"
+							>
+								See all results ({getTabCount("all")})
+							</button>
+						)}
+					</div>
 				) : (
 					<div className="space-y-1">
-						{results?.blogs?.map((blog) => (
-							<ResultItem
-								key={`blog-${blog.id}`}
-								icon={<FileText className="h-4 w-4 text-emerald-400" />}
-								title={blog.title}
-								subtitle={truncate(blog.excerpt)}
-								badge={`${blog.read_time} min read`}
-								onClick={() => onNavigate(`/blog/${blog.slug}`)}
-							/>
-						))}
-						{results?.projects?.map((project) => (
-							<ResultItem
-								key={`project-${project.id}`}
-								icon={<FolderGit2 className="h-4 w-4 text-emerald-400" />}
-								title={project.title}
-								subtitle={truncate(project.description)}
-								pills={project.technologies?.slice(0, 3)}
-								onClick={() => onNavigate(`/projects/${project.slug}`)}
-							/>
-						))}
-						{results?.shares?.map((share) => (
-							<ResultItem
-								key={`share-${share.id}`}
-								icon={<Share2 className="h-4 w-4 text-emerald-400" />}
-								title={share.title ?? "Untitled"}
-								subtitle={truncate(share.description ?? share.commentary)}
-								badge={share.source_type.replace("_", " ")}
-								onClick={() => onNavigate(`/shares/${share.slug}`)}
-							/>
-						))}
+						{(activeTab === "all" || activeTab === "blog") &&
+							results?.blogs?.map((blog) => (
+								<ResultItem
+									key={`blog-${blog.id}`}
+									icon={<FileText className="h-4 w-4" />}
+									title={blog.title}
+									subtitle={truncate(blog.excerpt)}
+									badge={`${blog.read_time} min read`}
+									onClick={() => onNavigate(`/blog/${blog.slug}`)}
+								/>
+							))}
+						{(activeTab === "all" || activeTab === "project") &&
+							results?.projects?.map((project) => (
+								<ResultItem
+									key={`project-${project.id}`}
+									icon={<Briefcase className="h-4 w-4" />}
+									title={project.title}
+									subtitle={truncate(project.description)}
+									pills={project.technologies?.slice(0, 3)}
+									onClick={() => onNavigate(`/projects/${project.slug}`)}
+								/>
+							))}
+						{(activeTab === "all" || activeTab === "share") &&
+							results?.shares?.map((share) => (
+								<ResultItem
+									key={`share-${share.id}`}
+									icon={<Share2 className="h-4 w-4" />}
+									title={share.title ?? "Untitled"}
+									subtitle={truncate(share.description ?? share.commentary)}
+									badge={share.source_type.replace("_", " ")}
+									onClick={() => onNavigate(`/shares/${share.slug}`)}
+								/>
+							))}
 					</div>
 				)}
 			</div>
@@ -343,6 +358,7 @@ function ResultsDropdown({
 					to search
 				</span>
 			</div>
+		</div>
 		</div>
 	);
 }
@@ -368,9 +384,11 @@ function ResultItem({
 		<button
 			onClick={onClick}
 			type="button"
-			className="w-full flex items-start gap-3 px-3 py-2 rounded-md text-left hover:bg-emerald-500/10 transition-colors"
+			className="w-full flex items-center gap-3 px-3 py-2 rounded-md text-left hover:bg-emerald-500/10 transition-colors"
 		>
-			<span className="mt-0.5 shrink-0">{icon}</span>
+			<span className="shrink-0 flex items-center justify-center h-8 w-8 rounded-lg bg-emerald-500/15 text-emerald-400">
+				{icon}
+			</span>
 			<div className="flex-1 min-w-0">
 				<div className="flex items-center gap-2">
 					<span className="text-sm font-medium text-foreground truncate">
