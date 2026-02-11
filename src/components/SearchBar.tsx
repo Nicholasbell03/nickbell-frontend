@@ -60,9 +60,9 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 		[navigate, close, onNavigate],
 	);
 
-	// Debounce query
+	// Debounce query (trim to prevent whitespace-only searches)
 	useEffect(() => {
-		const timer = setTimeout(() => setDebouncedQuery(query), 300);
+		const timer = setTimeout(() => setDebouncedQuery(query.trim()), 300);
 		return () => clearTimeout(timer);
 	}, [query]);
 
