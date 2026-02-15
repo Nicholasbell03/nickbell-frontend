@@ -34,8 +34,12 @@ const iconMap: Partial<Record<string, IconType>> = {
 };
 
 export function TechStack() {
-	const { data, isLoading } = useTechnologies();
+	const { data, isLoading, isError, error } = useTechnologies();
 	const technologies = data?.data;
+
+	if (isError) {
+		console.warn("Failed to load technologies:", error);
+	}
 
 	if (isLoading) {
 		return (
@@ -48,7 +52,11 @@ export function TechStack() {
 	}
 
 	if (!technologies || technologies.length === 0) {
-		return null;
+		return (
+			<Card className="border-emerald-500/20 h-full md:col-span-2">
+				<CardContent className="p-6" />
+			</Card>
+		);
 	}
 
 	return (
