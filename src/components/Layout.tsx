@@ -2,6 +2,8 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Navigation } from './Navigation';
 import { Footer } from './Footer';
+import { ChatPanel } from './ChatPanel';
+import { ChatWidget } from './ChatWidget';
 
 export function Layout() {
   const location = useLocation();
@@ -17,6 +19,8 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <ChatPanel />
+      <ChatWidget />
     </div>
   );
 }

@@ -1,36 +1,35 @@
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Bot } from "lucide-react";
 import Markdown from "react-markdown";
+import { ContentReferenceCard } from "@/components/ContentReferenceCard";
+import { useStreamedText } from "@/hooks/useStreamedText";
+import type { ContentReference } from "@/types/chat";
+
+const MAX_REFERENCES = 4;
 
 interface ChatMessageProps {
 	role: "user" | "assistant";
 	content: string;
 	isStreaming?: boolean;
+	references?: ContentReference[];
 }
 
 export const ChatMessage = ({
 	role,
 	content,
 	isStreaming,
+	references,
 }: ChatMessageProps) => {
 	const isUser = role === "user";
+	const displayedContent = useStreamedText(content, !!isStreaming && !isUser);
+	const isBufferDrained = displayedContent.length >= content.length;
+	const showReferences =
+		!isUser && !isStreaming && isBufferDrained && references && references.length > 0;
 
 	return (
 		<div
-			className={`flex gap-4 mb-6 animate-fade-in ${isUser ? "flex-row-reverse" : "flex-row"}`}
+			className={`flex mb-4 animate-fade-in ${isUser ? "justify-end" : "justify-start"}`}
 		>
-			<Avatar
-				className={`h-10 w-10 flex-shrink-0 ${isUser ? "ring-2 ring-emerald-500/30" : "ring-2 ring-teal-500/30"}`}
-			>
-				<AvatarFallback
-					className={`${isUser ? "bg-gradient-to-br from-emerald-500 to-teal-500" : "bg-gradient-to-br from-slate-700 to-slate-600"} text-white text-sm font-semibold`}
-				>
-					{isUser ? "U" : <Bot className="h-5 w-5" />}
-				</AvatarFallback>
-			</Avatar>
-
 			<div
-				className={`flex-1 max-w-[80%] ${isUser ? "items-end" : "items-start"} flex flex-col`}
+				className={`max-w-[85%] ${isUser ? "items-end" : "items-start"} flex flex-col`}
 			>
 				<div
 					className={`rounded-2xl px-5 py-3 backdrop-blur-sm ${
@@ -45,13 +44,30 @@ export const ChatMessage = ({
 						</p>
 					) : (
 						<div className="text-sm leading-relaxed prose prose-invert prose-sm max-w-none prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline">
-							<Markdown>{content}</Markdown>
-							{isStreaming && (
+							<Markdown>{displayedContent}</Markdown>
+							{(isStreaming ||
+								displayedContent.length < content.length) && (
 								<span className="inline-block w-2 h-4 bg-emerald-400 animate-pulse ml-0.5 align-text-bottom" />
 							)}
 						</div>
 					)}
 				</div>
+
+				{showReferences && (
+					<div className="mt-3 w-full space-y-2 animate-fade-in">
+						<p className="text-xs font-medium text-slate-500 uppercase tracking-wider">
+							Relevant to your query
+						</p>
+						<div className="grid gap-2">
+							{references.slice(0, MAX_REFERENCES).map((ref) => (
+								<ContentReferenceCard
+									key={`${ref.type}:${ref.slug}`}
+									reference={ref}
+								/>
+							))}
+						</div>
+					</div>
+				)}
 			</div>
 		</div>
 	);
