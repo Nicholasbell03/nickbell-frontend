@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Buffers streamed text and reveals it word-by-word at a consistent pace,
@@ -12,12 +12,16 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 		isActive ? 0 : fullText.length,
 	);
 
+	// Track whether this message was ever streamed. Streaming messages start
+	// with isActive=true; localStorage messages start with false. The ref
+	// captures the initial value so the buffer keeps draining word-by-word
+	// even after isActive becomes false (stream ended).
+	const isStreamingRef = useRef(isActive);
+
 	useEffect(() => {
-		if (fullText.length === 0) return;
-		if (!isActive) {
-			setDisplayedLength(fullText.length);
-			return;
-		}
+		// Non-streaming messages (e.g. loaded from localStorage) are shown
+		// in full via the initial state value — nothing to animate.
+		if (fullText.length === 0 || !isStreamingRef.current) return;
 
 		const target = fullText.length;
 
@@ -38,7 +42,7 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 		}, 40);
 
 		return () => clearInterval(interval);
-	}, [fullText, isActive]);
+	}, [fullText]);
 
 	return fullText.slice(0, displayedLength);
 }
