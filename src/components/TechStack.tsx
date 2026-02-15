@@ -18,11 +18,11 @@ import type { IconType } from "react-icons";
 import { Loader2 } from "lucide-react";
 import { useTechnologies } from "@/hooks/useQueries";
 
-const iconMap: Record<string, IconType> = {
+const iconMap: Partial<Record<string, IconType>> = {
 	laravel: SiLaravel,
 	php: SiPhp,
 	typescript: SiTypescript,
-	"vue.js": SiVuedotjs,
+	"vue-js": SiVuedotjs,
 	react: SiReact,
 	mysql: SiMysql,
 	postgresql: SiPostgresql,
@@ -57,7 +57,7 @@ export function TechStack() {
 				<h2 className="text-3xl md:text-4xl font-bold">Tech Stack</h2>
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
 					{technologies.map((tech, index) => {
-						const Icon = iconMap[tech.name.toLowerCase()];
+						const Icon = iconMap[tech.slug];
 						return (
 							<div
 								key={tech.slug}
