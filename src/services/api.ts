@@ -3,6 +3,7 @@ import type { GitHubActivity } from "@/types/github";
 import type { Project, ProjectSummary } from "@/types/project";
 import type { SearchResults, SearchType } from "@/types/search";
 import type { Share, ShareSummary } from "@/types/share";
+import type { Technology } from "@/types/technology";
 
 const API_BASE_URL =
 	import.meta.env.VITE_API_URL || "https://api.nickbell.dev";
@@ -114,6 +115,12 @@ export const chatApi = {
 			body: JSON.stringify({ message, conversation_id: conversationId }),
 			signal,
 		});
+	},
+};
+
+export const technologyApi = {
+	async getAll(): Promise<{ data: Technology[] }> {
+		return fetchApi<{ data: Technology[] }>("/api/v1/technologies");
 	},
 };
 
