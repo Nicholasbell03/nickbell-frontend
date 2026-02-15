@@ -29,7 +29,7 @@ export const ChatMessage = ({
 			className={`flex mb-4 animate-fade-in ${isUser ? "justify-end" : "justify-start"}`}
 		>
 			<div
-				className={`max-w-[85%] overflow-hidden ${isUser ? "items-end" : "items-start"} flex flex-col`}
+				className={`max-w-[85%] overflow-x-hidden ${isUser ? "items-end" : "items-start"} flex flex-col`}
 			>
 				<div
 					className={`rounded-2xl px-5 py-3 backdrop-blur-sm ${

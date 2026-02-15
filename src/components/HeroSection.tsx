@@ -122,19 +122,18 @@ export const HeroSection = () => {
 								enterKeyHint="send"
 								className="w-full py-5 pl-14 pr-14 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-lg"
 							/>
-							<div className="absolute right-5 flex items-center">
-								{query.trim() ? (
-									<button
-										type="submit"
-										className="p-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white transition-colors"
-										aria-label="Send message"
-									>
-										<ArrowRight className="h-4 w-4" />
-									</button>
-								) : (
-									<div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
-								)}
-							</div>
+							<button
+								type="submit"
+								disabled={!query.trim()}
+								className={`absolute right-5 p-1.5 rounded-full transition-all ${
+									query.trim()
+										? "bg-emerald-500 hover:bg-emerald-400 text-white opacity-100"
+										: "bg-emerald-500/20 text-emerald-500/40 opacity-0 pointer-events-none"
+								}`}
+								aria-label="Send message"
+							>
+								<ArrowRight className="h-4 w-4" />
+							</button>
 						</div>
 					</div>
 				</form>

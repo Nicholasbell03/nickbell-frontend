@@ -141,7 +141,7 @@ export function ShareDetailPage() {
             </a>
           )}
 
-          {share.source_type === 'webpage' && (
+          {share.source_type === 'webpage' && share.url && (
             <a
               href={share.url}
               target="_blank"
