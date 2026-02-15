@@ -22,6 +22,9 @@ function getDefaultTab(pathname: string): SearchType {
 	return "all";
 }
 
+const isMac =
+	typeof navigator !== "undefined" && navigator.platform.includes("Mac");
+
 function truncate(text: string | null, maxLength = 80): string {
 	if (!text) return "";
 	return text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
@@ -197,7 +200,7 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 					</button>
 				) : (
 					<span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground border border-emerald-500/20 rounded px-1.5 py-0.5 pointer-events-none">
-						{navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
+						{isMac ? "\u2318K" : "Ctrl+K"}
 					</span>
 				)}
 			</div>
@@ -353,7 +356,7 @@ function ResultsDropdown({
 				</span>
 				<span>
 					<kbd className="border border-emerald-500/20 rounded px-1 py-0.5">
-						{navigator.platform.includes("Mac") ? "\u2318K" : "Ctrl+K"}
+						{isMac ? "\u2318K" : "Ctrl+K"}
 					</kbd>{" "}
 					to search
 				</span>

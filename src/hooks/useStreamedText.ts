@@ -14,6 +14,10 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 
 	useEffect(() => {
 		if (fullText.length === 0) return;
+		if (!isActive) {
+			setDisplayedLength(fullText.length);
+			return;
+		}
 
 		const target = fullText.length;
 
@@ -34,7 +38,7 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 		}, 40);
 
 		return () => clearInterval(interval);
-	}, [fullText]);
+	}, [fullText, isActive]);
 
 	return fullText.slice(0, displayedLength);
 }
