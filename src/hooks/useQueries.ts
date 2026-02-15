@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { blogApi, githubApi, projectApi, searchApi, shareApi } from '@/services/api';
+import { blogApi, githubApi, projectApi, searchApi, shareApi, technologyApi } from '@/services/api';
 import type { SearchType } from '@/types/search';
 
 /**
@@ -36,6 +36,9 @@ export const queryKeys = {
   github: {
     all: ['github'] as const,
     activity: () => [...queryKeys.github.all, 'activity'] as const,
+  },
+  technologies: {
+    all: ['technologies'] as const,
   },
   search: {
     all: ['search'] as const,
@@ -157,6 +160,17 @@ export function useGitHubActivity() {
     queryKey: queryKeys.github.activity(),
     queryFn: () => githubApi.getActivity(),
     staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+/**
+ * Fetch featured technologies for homepage tech stack
+ */
+export function useTechnologies() {
+  return useQuery({
+    queryKey: queryKeys.technologies.all,
+    queryFn: () => technologyApi.getAll(),
+    staleTime: 60 * 60 * 1000, // 1 hour
   });
 }
 
