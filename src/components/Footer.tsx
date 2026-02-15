@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 const socialLinks = [
   { name: 'GitHub', icon: Github, url: 'https://github.com/Nicholasbell03' },
   { name: 'LinkedIn', icon: Linkedin, url: 'https://linkedin.com/in/nicholas-j-bell' },
-  { name: 'Twitter', icon: Twitter, url: 'https://twitter.com/nickbell03' },
+  { name: 'Twitter', icon: Twitter, url: 'https://x.com/nickbell03' },
   { name: 'Email', icon: Mail, url: 'mailto:nicholasbell03@gmail.com' },
 ];
 
