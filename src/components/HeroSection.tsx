@@ -1,29 +1,83 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { Search, ChevronDown, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import { useChatContext } from "@/context/ChatContext";
 
-const PLACEHOLDER_QUESTIONS = [
+const SUGGESTIONS = [
 	"What's Nick's latest blog post about?",
 	"What qualifications does Nick have?",
 	"Give me a list of projects Nick worked on.",
+	"What is Nick's tech stack?",
+	"Tell me about Nick's experience with AI.",
+	"What programming languages does Nick know?",
+	"What's Nick's professional background?",
+	"What frameworks does Nick specialise in?",
+	"Tell me about Nick's work with Laravel.",
+	"What frontend technologies does Nick use?",
+	"Has Nick written about React or TypeScript?",
+	"What kind of applications does Nick build?",
+	"Summarise Nick's most recent project.",
+	"Does Nick have any shared links or resources?",
+	"How can I get in touch with Nick?",
 ];
+
+const TYPEWRITER_QUESTIONS = SUGGESTIONS.slice(0, 3);
+
+function filterSuggestions(
+	query: string,
+	suggestions: string[],
+	max = 4,
+): string[] {
+	const trimmed = query.trim().toLowerCase();
+	if (!trimmed) return suggestions.slice(0, max);
+	const words = trimmed.split(/\s+/);
+
+	return suggestions
+		.filter((s) => {
+			const lower = s.toLowerCase();
+			return words.every((w) => lower.includes(w));
+		})
+		.slice(0, max);
+}
 
 export const HeroSection = () => {
 	const [query, setQuery] = useState("");
 	const [pendingQuery, setPendingQuery] = useState<string | null>(null);
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [focusedIndex, setFocusedIndex] = useState(-1);
 	const formRef = useRef<HTMLFormElement>(null);
+	const wrapperRef = useRef<HTMLDivElement>(null);
 	const { messages, sendMessage, clearChat, openPanel, setHeroInputVisible } =
 		useChatContext();
 
 	const placeholderText = useTypewriter({
-		words: PLACEHOLDER_QUESTIONS,
+		words: TYPEWRITER_QUESTIONS,
 		typeSpeed: 80,
 		deleteSpeed: 40,
 		delayBetweenWords: 2000,
 		loop: true,
 	});
+
+	const filteredSuggestions = useMemo(
+		() => filterSuggestions(query, SUGGESTIONS),
+		[query],
+	);
+
+	// Close suggestions on outside click
+	useEffect(() => {
+		function handleClickOutside(e: MouseEvent) {
+			if (
+				wrapperRef.current &&
+				!wrapperRef.current.contains(e.target as Node)
+			) {
+				setShowSuggestions(false);
+			}
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		return () =>
+			document.removeEventListener("mousedown", handleClickOutside);
+	}, []);
 
 	// Track hero input visibility with IntersectionObserver
 	useEffect(() => {
@@ -49,6 +103,8 @@ export const HeroSection = () => {
 			e.preventDefault();
 			if (!query.trim()) return;
 
+			setShowSuggestions(false);
+
 			if (messages.length > 0) {
 				setPendingQuery(query.trim());
 				setQuery("");
@@ -60,6 +116,21 @@ export const HeroSection = () => {
 			setQuery("");
 		},
 		[query, messages.length, sendMessage, openPanel],
+	);
+
+	const handleSuggestionSelect = useCallback(
+		(value: string) => {
+			setShowSuggestions(false);
+
+			if (messages.length > 0) {
+				setPendingQuery(value);
+				return;
+			}
+
+			sendMessage(value);
+			openPanel();
+		},
+		[messages.length, sendMessage, openPanel],
 	);
 
 	const handleNewConversation = useCallback(() => {
@@ -81,11 +152,50 @@ export const HeroSection = () => {
 		setPendingQuery(null);
 	}, []);
 
+	const handleKeyDown = useCallback(
+		(e: React.KeyboardEvent<HTMLInputElement>) => {
+			if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+			switch (e.key) {
+				case "ArrowDown":
+					e.preventDefault();
+					setFocusedIndex((prev) =>
+						prev < filteredSuggestions.length - 1 ? prev + 1 : 0,
+					);
+					break;
+				case "ArrowUp":
+					e.preventDefault();
+					setFocusedIndex((prev) =>
+						prev > 0 ? prev - 1 : filteredSuggestions.length - 1,
+					);
+					break;
+				case "Enter":
+					if (focusedIndex >= 0) {
+						e.preventDefault();
+						handleSuggestionSelect(
+							filteredSuggestions[focusedIndex],
+						);
+					}
+					break;
+				case "Escape":
+					setShowSuggestions(false);
+					setFocusedIndex(-1);
+					break;
+			}
+		},
+		[
+			showSuggestions,
+			filteredSuggestions,
+			focusedIndex,
+			handleSuggestionSelect,
+		],
+	);
+
 	return (
-		<div className="relative min-h-screen flex flex-col px-4 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+		<div className="relative min-h-[calc(100vh-4rem)] flex flex-col px-4 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
 			<div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-slate-900/50 to-slate-950"></div>
 
-			<div className="relative z-10 flex flex-col items-center justify-center min-h-screen space-y-8 max-w-4xl w-full mx-auto py-20">
+			<div className="relative z-10 flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] space-y-8 max-w-4xl w-full mx-auto py-20">
 				<div className="flex flex-col items-center space-y-6 animate-fade-in">
 					<Avatar className="h-20 w-20 ring-2 ring-emerald-500/30 ring-offset-4 ring-offset-slate-950">
 						<AvatarFallback className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white text-2xl font-semibold">
@@ -110,31 +220,96 @@ export const HeroSection = () => {
 					onSubmit={handleSubmit}
 					className="w-full max-w-3xl animate-fade-in-delay"
 				>
-					<div className="relative group">
-						<div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
-						<div className="relative flex items-center bg-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-500/20 overflow-hidden">
-							<Search className="absolute left-5 h-5 w-5 text-emerald-400" />
-							<input
-								type="text"
-								value={query}
-								onChange={(e) => setQuery(e.target.value)}
-								placeholder={placeholderText}
-								enterKeyHint="send"
-								className="w-full py-5 pl-14 pr-14 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-lg"
-							/>
-							<button
-								type="submit"
-								disabled={!query.trim()}
-								className={`absolute right-5 p-1.5 rounded-full transition-all ${
-									query.trim()
-										? "bg-emerald-500 hover:bg-emerald-400 text-white opacity-100"
-										: "bg-emerald-500/20 text-emerald-500/40 opacity-0 pointer-events-none"
-								}`}
-								aria-label="Send message"
-							>
-								<ArrowRight className="h-4 w-4" />
-							</button>
+					<div ref={wrapperRef} className="relative">
+						<div className="relative group">
+							<div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
+							<div className="relative flex items-center bg-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-500/20 overflow-hidden">
+								<Search className="absolute left-5 h-5 w-5 text-emerald-400" />
+								<input
+									type="text"
+									value={query}
+									onChange={(e) => {
+										setQuery(e.target.value);
+										setFocusedIndex(-1);
+									}}
+									onFocus={() =>
+										setShowSuggestions(true)
+									}
+									onKeyDown={handleKeyDown}
+									placeholder={placeholderText}
+									enterKeyHint="send"
+									role="combobox"
+									aria-expanded={showSuggestions && filteredSuggestions.length > 0}
+									aria-activedescendant={
+										focusedIndex >= 0
+											? `suggestion-${focusedIndex}`
+											: undefined
+									}
+									aria-controls="suggestions-listbox"
+									aria-autocomplete="list"
+									className="w-full py-5 pl-14 pr-14 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-lg"
+								/>
+								<button
+									type="submit"
+									disabled={!query.trim()}
+									className={`absolute right-5 p-1.5 rounded-full transition-all ${
+										query.trim()
+											? "bg-emerald-500 hover:bg-emerald-400 text-white opacity-100"
+											: "bg-emerald-500/20 text-emerald-500/40 opacity-0 pointer-events-none"
+									}`}
+									aria-label="Send message"
+								>
+									<ArrowRight className="h-4 w-4" />
+								</button>
+							</div>
 						</div>
+						{showSuggestions && filteredSuggestions.length > 0 && (
+							<ul
+								id="suggestions-listbox"
+								role="listbox"
+								className="absolute w-full mt-2 bg-slate-900/95 backdrop-blur-xl border border-emerald-500/20 rounded-xl shadow-2xl max-h-[min(220px,30vh)] overflow-y-auto z-50"
+							>
+								{filteredSuggestions.map((suggestion, i) => (
+									<li
+										key={suggestion}
+										id={`suggestion-${i}`}
+										role="option"
+										aria-selected={i === focusedIndex}
+										onMouseDown={(e) => {
+											e.preventDefault();
+											handleSuggestionSelect(
+												suggestion,
+											);
+										}}
+										onMouseEnter={() =>
+											setFocusedIndex(i)
+										}
+										className={`flex items-center gap-3 px-4 py-3 cursor-pointer select-none ${
+											i === focusedIndex
+												? "bg-emerald-500/10"
+												: ""
+										}`}
+									>
+										<Search
+											className={`h-4 w-4 shrink-0 ${
+												i === focusedIndex
+													? "text-emerald-400"
+													: "text-slate-500"
+											}`}
+										/>
+										<span
+											className={
+												i === focusedIndex
+													? "text-emerald-300"
+													: "text-slate-300"
+											}
+										>
+											{suggestion}
+										</span>
+									</li>
+								))}
+							</ul>
+						)}
 					</div>
 				</form>
 
@@ -170,9 +345,11 @@ export const HeroSection = () => {
 					</div>
 				)}
 
-				<div className="absolute bottom-10 animate-bounce">
-					<ChevronDown className="h-6 w-6 text-emerald-500/50" />
-				</div>
+				{!showSuggestions && (
+					<div className="absolute bottom-10 animate-bounce">
+						<ChevronDown className="h-6 w-6 text-emerald-500/50" />
+					</div>
+				)}
 			</div>
 		</div>
 	);
