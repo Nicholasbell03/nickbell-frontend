@@ -102,6 +102,21 @@ export const shareApi = {
 	},
 };
 
+export const chatApi = {
+	streamChat(
+		message: string,
+		conversationId: string | null,
+		signal?: AbortSignal,
+	): Promise<Response> {
+		return fetch(`${API_BASE_URL}/api/v1/chat`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ message, conversation_id: conversationId }),
+			signal,
+		});
+	},
+};
+
 export const searchApi = {
 	async search(
 		query: string,

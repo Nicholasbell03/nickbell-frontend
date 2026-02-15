@@ -6,6 +6,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
 import './index.css';
 import App from './App';
+import { ChatProvider } from './context/ChatContext';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -24,8 +25,10 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <App />
-        <Toaster position="top-right" richColors />
+        <ChatProvider>
+          <App />
+          <Toaster position="top-right" richColors />
+        </ChatProvider>
       </BrowserRouter>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
