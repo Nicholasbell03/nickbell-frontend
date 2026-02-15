@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, ArrowRight } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useTypewriter } from "@/hooks/useTypewriter";
 import { useChatContext } from "@/context/ChatContext";
@@ -119,10 +119,21 @@ export const HeroSection = () => {
 								value={query}
 								onChange={(e) => setQuery(e.target.value)}
 								placeholder={placeholderText}
-								className="w-full py-5 pl-14 pr-5 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-lg"
+								enterKeyHint="send"
+								className="w-full py-5 pl-14 pr-14 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-lg"
 							/>
 							<div className="absolute right-5 flex items-center">
-								<div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse"></div>
+								{query.trim() ? (
+									<button
+										type="submit"
+										className="p-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white transition-colors"
+										aria-label="Send message"
+									>
+										<ArrowRight className="h-4 w-4" />
+									</button>
+								) : (
+									<div className="h-2 w-2 bg-emerald-500 rounded-full animate-pulse" />
+								)}
 							</div>
 						</div>
 					</div>

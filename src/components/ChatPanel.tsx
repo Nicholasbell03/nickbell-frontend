@@ -86,7 +86,7 @@ export function ChatPanel() {
 
 			{/* Panel */}
 			<div
-				className={`fixed top-0 right-0 z-50 h-full w-full sm:w-3/5 max-w-[700px] flex flex-col bg-slate-950 border-l border-slate-800 shadow-2xl transition-transform duration-300 ease-in-out ${
+				className={`fixed top-0 right-0 z-50 h-dvh w-full sm:w-3/5 max-w-[700px] flex flex-col bg-slate-950 border-l border-slate-800 shadow-2xl transition-transform duration-300 ease-in-out ${
 					isPanelOpen ? "translate-x-0" : "translate-x-full"
 				}`}
 				role="dialog"
@@ -125,7 +125,7 @@ export function ChatPanel() {
 				</div>
 
 				{/* Messages */}
-				<div className="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+				<div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
 					{messages.length === 0 ? (
 						<div className="flex flex-col items-center justify-center h-full text-center px-6">
 							<div className="flex items-center justify-center h-16 w-16 rounded-full bg-slate-800/80 border border-slate-700/50 mb-4">
@@ -178,7 +178,7 @@ export function ChatPanel() {
 				)}
 
 				{/* Input */}
-				<div className="px-4 pb-4 pt-2 border-t border-slate-800">
+				<div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 border-t border-slate-800">
 					<form onSubmit={handleSubmit}>
 						<div className="relative flex items-center bg-slate-900/90 backdrop-blur-xl rounded-xl border border-slate-700/50 focus-within:border-emerald-500/30 transition-colors">
 							<Search className="absolute left-4 h-4 w-4 text-emerald-400" />

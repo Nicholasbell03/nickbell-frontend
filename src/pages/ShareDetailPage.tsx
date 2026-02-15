@@ -141,6 +141,21 @@ export function ShareDetailPage() {
             </a>
           )}
 
+          {share.source_type === 'webpage' && (
+            <a
+              href={share.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all group"
+            >
+              <ExternalLink className="h-6 w-6 text-emerald-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              <div className="min-w-0">
+                <p className="text-sm text-muted-foreground mb-1">Visit Link</p>
+                <p className="text-emerald-400 font-medium truncate">{share.url}</p>
+              </div>
+            </a>
+          )}
+
           {share.description && (
             <p className="text-xl text-muted-foreground">{share.description}</p>
           )}
