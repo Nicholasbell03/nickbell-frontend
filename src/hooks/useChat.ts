@@ -1,14 +1,230 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { chatApi } from "@/services/api";
-import type { ChatMessage } from "@/types/chat";
+import type { ChatMessage, ContentReference } from "@/types/chat";
 
 const CONVERSATION_ID_KEY = "chat_conversation_id";
+const MESSAGES_KEY = "chat_messages";
+
+function loadMessages(): ChatMessage[] {
+	try {
+		const stored = localStorage.getItem(MESSAGES_KEY);
+		if (stored) {
+			const parsed = JSON.parse(stored);
+			if (Array.isArray(parsed)) return parsed;
+		}
+	} catch {
+		// localStorage unavailable or corrupt
+	}
+	return [];
+}
+
+function saveMessages(messages: ChatMessage[]): void {
+	try {
+		localStorage.setItem(MESSAGES_KEY, JSON.stringify(messages));
+	} catch {
+		// localStorage unavailable
+	}
+}
+
+function clearStoredMessages(): void {
+	try {
+		localStorage.removeItem(MESSAGES_KEY);
+	} catch {
+		// localStorage unavailable
+	}
+}
+
+interface ToolResultEvent {
+	type: "tool_result";
+	tool_name: string;
+	result: unknown;
+	successful: boolean;
+}
+
+function parseToolResultToReferences(
+	toolName: string,
+	result: unknown,
+): ContentReference[] {
+	const refs: ContentReference[] = [];
+
+	switch (toolName) {
+		case "GetBlogs": {
+			const blogs = result as Array<{
+				title: string;
+				slug: string;
+				excerpt?: string | null;
+				featured_image?: string | null;
+				read_time?: number;
+			}>;
+			for (const b of blogs) {
+				refs.push({
+					type: "blog",
+					slug: b.slug,
+					title: b.title,
+					description: b.excerpt ?? null,
+					image: b.featured_image ?? null,
+					href: `/blog/${b.slug}`,
+					meta: b.read_time ? { read_time: b.read_time } : undefined,
+				});
+			}
+			break;
+		}
+		case "GetBlogDetail": {
+			const b = result as {
+				title: string;
+				slug: string;
+				excerpt?: string | null;
+				featured_image?: string | null;
+				read_time?: number;
+			};
+			refs.push({
+				type: "blog",
+				slug: b.slug,
+				title: b.title,
+				description: b.excerpt ?? null,
+				image: b.featured_image ?? null,
+				href: `/blog/${b.slug}`,
+				meta: b.read_time ? { read_time: b.read_time } : undefined,
+			});
+			break;
+		}
+		case "GetProjects": {
+			const projects = result as Array<{
+				title: string;
+				slug: string;
+				description?: string | null;
+				featured_image?: string | null;
+				technologies?: string[];
+			}>;
+			for (const p of projects) {
+				refs.push({
+					type: "project",
+					slug: p.slug,
+					title: p.title,
+					description: p.description ?? null,
+					image: p.featured_image ?? null,
+					href: `/projects/${p.slug}`,
+					meta: p.technologies?.length
+						? { technologies: p.technologies }
+						: undefined,
+				});
+			}
+			break;
+		}
+		case "GetProjectDetail": {
+			const p = result as {
+				title: string;
+				slug: string;
+				description?: string | null;
+				featured_image?: string | null;
+				technologies?: string[];
+			};
+			refs.push({
+				type: "project",
+				slug: p.slug,
+				title: p.title,
+				description: p.description ?? null,
+				image: p.featured_image ?? null,
+				href: `/projects/${p.slug}`,
+				meta: p.technologies?.length
+					? { technologies: p.technologies }
+					: undefined,
+			});
+			break;
+		}
+		case "GetShares": {
+			const shares = result as Array<{
+				title?: string | null;
+				slug: string;
+				description?: string | null;
+				image_url?: string | null;
+				source_type?: string;
+			}>;
+			for (const s of shares) {
+				if (!s.title) continue;
+				refs.push({
+					type: "share",
+					slug: s.slug,
+					title: s.title,
+					description: s.description ?? null,
+					image: s.image_url ?? null,
+					href: `/shares/${s.slug}`,
+					meta: s.source_type ? { source_type: s.source_type } : undefined,
+				});
+			}
+			break;
+		}
+		case "SearchContent": {
+			const data = result as {
+				blogs?: Array<{
+					title: string;
+					slug: string;
+					excerpt?: string | null;
+					featured_image?: string | null;
+					read_time?: number;
+				}>;
+				projects?: Array<{
+					title: string;
+					slug: string;
+					description?: string | null;
+					featured_image?: string | null;
+					technologies?: string[];
+				}>;
+				shares?: Array<{
+					title?: string | null;
+					slug: string;
+					description?: string | null;
+					image_url?: string | null;
+					source_type?: string;
+				}>;
+			};
+			if (data.blogs) {
+				refs.push(
+					...parseToolResultToReferences("GetBlogs", data.blogs),
+				);
+			}
+			if (data.projects) {
+				refs.push(
+					...parseToolResultToReferences("GetProjects", data.projects),
+				);
+			}
+			if (data.shares) {
+				refs.push(
+					...parseToolResultToReferences("GetShares", data.shares),
+				);
+			}
+			break;
+		}
+		// GetCVDetail returns plain text — not linkable, skip
+	}
+
+	return refs;
+}
+
+function deduplicateReferences(refs: ContentReference[]): ContentReference[] {
+	const seen = new Set<string>();
+	return refs.filter((ref) => {
+		const key = `${ref.type}:${ref.slug}`;
+		if (seen.has(key)) return false;
+		seen.add(key);
+		return true;
+	});
+}
 
 export function useChat() {
-	const [messages, setMessages] = useState<ChatMessage[]>([]);
+	const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
+	const prevStreamingRef = useRef(false);
+
+	// Persist messages when streaming finishes (true → false transition)
+	useEffect(() => {
+		if (prevStreamingRef.current && !isStreaming) {
+			saveMessages(messages);
+		}
+		prevStreamingRef.current = isStreaming;
+	}, [isStreaming, messages]);
 
 	const getConversationId = (): string | null => {
 		try {
@@ -36,7 +252,11 @@ export function useChat() {
 
 	const sendMessage = useCallback(async (text: string) => {
 		const userMessage: ChatMessage = { role: "user", content: text };
-		setMessages((prev) => [...prev, userMessage]);
+		setMessages((prev) => {
+			const updated = [...prev, userMessage];
+			saveMessages(updated);
+			return updated;
+		});
 		setIsStreaming(true);
 		setError(null);
 
@@ -112,6 +332,40 @@ export function useChat() {
 								}
 								return updated;
 							});
+						} else if (event.type === "tool_result") {
+							const toolEvent = event as ToolResultEvent;
+							if (!toolEvent.successful) continue;
+
+							let result = toolEvent.result;
+							if (typeof result === "string") {
+								try {
+									result = JSON.parse(result);
+								} catch {
+									continue;
+								}
+							}
+
+							const newRefs = parseToolResultToReferences(
+								toolEvent.tool_name,
+								result,
+							);
+							if (newRefs.length === 0) continue;
+
+							setMessages((prev) => {
+								const updated = [...prev];
+								const last = updated[updated.length - 1];
+								if (last?.role === "assistant") {
+									const existing = last.references ?? [];
+									updated[updated.length - 1] = {
+										...last,
+										references: deduplicateReferences([
+											...existing,
+											...newRefs,
+										]),
+									};
+								}
+								return updated;
+							});
 						}
 					} catch {
 						// Skip unparseable lines
@@ -138,6 +392,7 @@ export function useChat() {
 		setMessages([]);
 		setError(null);
 		clearConversationId();
+		clearStoredMessages();
 	}, []);
 
 	return {
