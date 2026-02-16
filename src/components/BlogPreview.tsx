@@ -19,7 +19,7 @@ export function BlogPreview() {
 
 	if (isLoading) {
 		return (
-			<section className="py-16 md:py-24 px-4 bg-background/50">
+			<section className="py-8 md:py-14 px-4 bg-background/50">
 				<div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[300px]">
 					<Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
 				</div>
@@ -32,7 +32,7 @@ export function BlogPreview() {
 	}
 
 	return (
-		<section className="py-16 md:py-24 px-4 bg-background/50">
+		<section className="py-8 md:py-14 px-4 bg-background/50">
 			<div
 				ref={fadeInRef}
 				className={`container mx-auto max-w-7xl ${fadeInClass}`}
