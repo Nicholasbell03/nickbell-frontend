@@ -124,6 +124,7 @@ export const HeroSection = () => {
 
 			if (messages.length > 0) {
 				setPendingQuery(value);
+				setQuery(value);
 				return;
 			}
 
@@ -220,7 +221,14 @@ export const HeroSection = () => {
 					onSubmit={handleSubmit}
 					className="w-full max-w-3xl animate-fade-in-delay"
 				>
-					<div ref={wrapperRef} className="relative">
+					<div
+						ref={wrapperRef}
+						className="relative"
+						role="combobox"
+						aria-expanded={showSuggestions && filteredSuggestions.length > 0}
+						aria-haspopup="listbox"
+						aria-owns="suggestions-listbox"
+					>
 						<div className="relative group">
 							<div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
 							<div className="relative flex items-center bg-slate-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-500/20 overflow-hidden">
@@ -238,8 +246,8 @@ export const HeroSection = () => {
 									onKeyDown={handleKeyDown}
 									placeholder={placeholderText}
 									enterKeyHint="send"
-									role="combobox"
-									aria-expanded={showSuggestions && filteredSuggestions.length > 0}
+									role="searchbox"
+									aria-label="Ask sudo about Nick"
 									aria-activedescendant={
 										focusedIndex >= 0
 											? `suggestion-${focusedIndex}`

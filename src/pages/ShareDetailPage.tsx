@@ -123,7 +123,7 @@ export function ShareDetailPage() {
 					{sanitizedCommentary && (
 						<div className="border-t border-emerald-500/20 pt-8">
 							<h2 className="text-lg font-semibold mb-4 text-emerald-400">
-								My Blogs
+								My Thoughts
 							</h2>
 							<div
 								className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground"
