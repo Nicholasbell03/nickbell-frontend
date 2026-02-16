@@ -1,4 +1,6 @@
+import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ExternalLink, Github, Loader2, Eye } from 'lucide-react';
@@ -11,6 +13,14 @@ export function ProjectDetailPage() {
   const previewToken = getPreviewToken();
   const { data, isLoading, error } = useProject(slug, previewToken);
   const project = data?.data ?? null;
+
+  const sanitizedLongDescription = useMemo(
+    () => project?.long_description ? DOMPurify.sanitize(project.long_description, {
+      ADD_TAGS: ['svg', 'path', 'line', 'rect', 'polygon', 'text', 'circle', 'ellipse', 'g', 'defs', 'clipPath', 'use'],
+      ADD_ATTR: ['viewBox', 'xmlns', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'd', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'text-anchor', 'font-size', 'font-weight', 'points', 'transform', 'clip-path'],
+    }) : '',
+    [project],
+  );
 
   if (isLoading) {
     return (
@@ -126,11 +136,10 @@ export function ProjectDetailPage() {
           )}
 
           {project.long_description && (
-            <div className="prose prose-invert max-w-none">
-              <div className="text-lg leading-relaxed whitespace-pre-wrap">
-                {project.long_description}
-              </div>
-            </div>
+            <div
+              className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
+              dangerouslySetInnerHTML={{ __html: sanitizedLongDescription }}
+            />
           )}
         </article>
       </div>

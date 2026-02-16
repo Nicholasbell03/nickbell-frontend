@@ -73,7 +73,7 @@ export function SharesListPage() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {shares.map((share, index) => (
-            <Link key={share.id} to={`/shares/${share.slug}`}>
+            <Link key={share.id} to={`/shares/${share.slug}`} className="block">
               <Card
                 className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer flex flex-col"
                 style={{

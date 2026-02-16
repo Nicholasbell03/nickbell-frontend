@@ -103,6 +103,16 @@ export function BlogPostDetailPage() {
             <p className="text-xl text-muted-foreground">{post.excerpt}</p>
           </div>
 
+          {post.featured_image && (
+            <div className="rounded-lg overflow-hidden border border-emerald-500/20">
+              <img
+                src={post.featured_image}
+                alt={post.title}
+                className="w-full h-auto object-cover max-h-[400px]"
+              />
+            </div>
+          )}
+
           <div className="border-t border-emerald-500/20 pt-8">
             <div
               className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
