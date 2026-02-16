@@ -263,7 +263,10 @@ export function useChat() {
 		const abortController = new AbortController();
 		abortControllerRef.current = abortController;
 
-		const timeoutId = setTimeout(() => abortController.abort(), 30000);
+		const timeoutId = setTimeout(() => {
+			abortControllerRef.current = null;
+			abortController.abort();
+		}, 30000);
 
 		try {
 			const response = await chatApi.streamChat(
