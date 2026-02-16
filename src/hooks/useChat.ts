@@ -263,6 +263,11 @@ export function useChat() {
 		const abortController = new AbortController();
 		abortControllerRef.current = abortController;
 
+		const timeoutId = setTimeout(() => {
+			abortControllerRef.current = null;
+			abortController.abort();
+		}, 30000);
+
 		try {
 			const response = await chatApi.streamChat(
 				text,
@@ -320,7 +325,21 @@ export function useChat() {
 
 					try {
 						const event = JSON.parse(data);
-						if (event.type === "text_delta" && event.delta) {
+						if (event.type === "error" && event.message) {
+							setError(event.message);
+							setMessages((prev) => {
+								const updated = [...prev];
+								const last = updated[updated.length - 1];
+								if (
+									last?.role === "assistant" &&
+									last.content === ""
+								) {
+									updated.pop();
+								}
+								return updated;
+							});
+							break;
+						} else if (event.type === "text_delta" && event.delta) {
 							setMessages((prev) => {
 								const updated = [...prev];
 								const last = updated[updated.length - 1];
@@ -374,11 +393,18 @@ export function useChat() {
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") {
-				// User cancelled — not an error
+				if (!abortControllerRef.current) {
+					// Timeout — controller was cleared
+					setError(
+						"The request timed out. Please try again.",
+					);
+				}
+				// Otherwise user cancelled — not an error
 			} else {
 				setError("Something went wrong. Please try again.");
 			}
 		} finally {
+			clearTimeout(timeoutId);
 			setIsStreaming(false);
 			abortControllerRef.current = null;
 		}

@@ -12,7 +12,7 @@ export function HomePage() {
 	return (
 		<>
 			<HeroSection />
-			<section className="py-16 md:py-24 px-4">
+			<section className="py-8 md:py-14 px-4">
 				<div className="container mx-auto max-w-7xl">
 					<div
 						ref={techRowRef}

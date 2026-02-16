@@ -39,7 +39,7 @@ export function SharesPreview() {
 
 	if (isLoading) {
 		return (
-			<section className="py-16 md:py-24 px-4">
+			<section className="py-8 md:py-14 px-4">
 				<div className="container mx-auto max-w-7xl flex justify-center items-center min-h-[300px]">
 					<Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
 				</div>
@@ -52,7 +52,7 @@ export function SharesPreview() {
 	}
 
 	return (
-		<section className="py-16 md:py-24 px-4">
+		<section className="py-8 md:py-14 px-4">
 			<div ref={fadeInRef} className={`container mx-auto max-w-7xl ${fadeInClass}`}>
 				<div className="flex items-center justify-between mb-12">
 					<div className="space-y-2">
