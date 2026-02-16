@@ -41,7 +41,7 @@ export function ProjectsListPage() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {projects.map((project, index) => (
-            <Link key={project.id} to={`/projects/${project.slug}`}>
+            <Link key={project.id} to={`/projects/${project.slug}`} className="block">
               <Card
                 className="group hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 border-emerald-500/20 overflow-hidden h-full cursor-pointer"
                 style={{

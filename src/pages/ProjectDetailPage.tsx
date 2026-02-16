@@ -1,9 +1,11 @@
+import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ExternalLink, Github, Loader2, Eye } from 'lucide-react';
 import { getPreviewToken } from '@/services/api';
 import { useProject } from '@/hooks/useQueries';
+import { sanitizeCmsHtml } from '@/lib/sanitize';
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -11,6 +13,11 @@ export function ProjectDetailPage() {
   const previewToken = getPreviewToken();
   const { data, isLoading, error } = useProject(slug, previewToken);
   const project = data?.data ?? null;
+
+  const sanitizedLongDescription = useMemo(
+    () => project?.long_description ? sanitizeCmsHtml(project.long_description) : '',
+    [project],
+  );
 
   if (isLoading) {
     return (
@@ -126,11 +133,10 @@ export function ProjectDetailPage() {
           )}
 
           {project.long_description && (
-            <div className="prose prose-invert max-w-none">
-              <div className="text-lg leading-relaxed whitespace-pre-wrap">
-                {project.long_description}
-              </div>
-            </div>
+            <div
+              className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
+              dangerouslySetInnerHTML={{ __html: sanitizedLongDescription }}
+            />
           )}
         </article>
       </div>

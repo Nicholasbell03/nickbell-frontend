@@ -1,11 +1,11 @@
 import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import DOMPurify from 'dompurify';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { getPreviewToken } from '@/services/api';
 import { useBlog } from '@/hooks/useQueries';
+import { sanitizeCmsHtml } from '@/lib/sanitize';
 
 export function BlogPostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -15,10 +15,7 @@ export function BlogPostDetailPage() {
   const post = data?.data ?? null;
 
   const sanitizedContent = useMemo(
-    () => post?.content ? DOMPurify.sanitize(post.content, {
-      ADD_TAGS: ['svg', 'path', 'line', 'rect', 'polygon', 'text', 'circle', 'ellipse', 'g', 'defs', 'clipPath', 'use'],
-      ADD_ATTR: ['viewBox', 'xmlns', 'fill', 'stroke', 'stroke-width', 'stroke-dasharray', 'd', 'x', 'y', 'x1', 'y1', 'x2', 'y2', 'cx', 'cy', 'r', 'rx', 'ry', 'width', 'height', 'text-anchor', 'font-size', 'font-weight', 'points', 'transform', 'clip-path'],
-    }) : '',
+    () => post?.content ? sanitizeCmsHtml(post.content) : '',
     [post],
   );
 
@@ -102,6 +99,16 @@ export function BlogPostDetailPage() {
             <h1 className="text-4xl md:text-5xl font-bold leading-tight">{post.title}</h1>
             <p className="text-xl text-muted-foreground">{post.excerpt}</p>
           </div>
+
+          {post.featured_image && (
+            <div className="rounded-lg overflow-hidden border border-emerald-500/20">
+              <img
+                src={post.featured_image}
+                alt={post.title}
+                className="w-full h-auto object-cover max-h-[400px]"
+              />
+            </div>
+          )}
 
           <div className="border-t border-emerald-500/20 pt-8">
             <div
