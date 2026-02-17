@@ -105,7 +105,7 @@ export function BlogPostDetailPage() {
               <img
                 src={post.featured_image}
                 alt={post.title}
-                className="w-full h-auto object-cover max-h-[400px]"
+                className="w-full max-h-[400px] object-contain"
               />
             </div>
           )}
