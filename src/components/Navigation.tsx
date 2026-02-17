@@ -25,10 +25,10 @@ export function Navigation() {
 	return (
 		<nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-emerald-500/20">
 			<div className="container mx-auto max-w-7xl px-4">
-				<div className="flex items-center h-16 gap-1">
+				<div className="flex items-center h-16 lg:h-[4.5rem] gap-1">
 					<Link
 						to="/"
-						className={`flex items-center gap-2 group shrink-0 rounded-md px-2 py-1 transition-colors ${
+						className={`flex items-center gap-2 group shrink-0 rounded-md px-3 py-1.5 transition-colors ${
 							isActive("/")
 								? "bg-emerald-500/10"
 								: "hover:bg-emerald-500/5"
@@ -43,7 +43,7 @@ export function Navigation() {
 							<Link key={item.path} to={item.path}>
 								<Button
 									variant="ghost"
-									className={`${
+									className={`lg:text-[15px] ${
 										isActive(item.path)
 											? "text-emerald-400 bg-emerald-500/10"
 											: "hover:text-emerald-400 hover:bg-emerald-500/5"

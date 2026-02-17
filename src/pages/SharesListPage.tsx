@@ -1,6 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/ui/pagination';
 import { ArrowRight, Globe, Loader2 } from 'lucide-react';
 import { FaYoutube, FaXTwitter } from 'react-icons/fa6';
 import { formatDistanceToNow } from 'date-fns';
@@ -37,8 +38,16 @@ function SourceBadge({ type }: { type: SourceType }) {
 }
 
 export function SharesListPage() {
-  const { data, isLoading, error } = useShares();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page')) || 1;
+  const { data, isLoading, error } = useShares(page);
   const shares = data?.data ?? [];
+  const meta = data?.meta;
+
+  function handlePageChange(newPage: number) {
+    setSearchParams(newPage > 1 ? { page: String(newPage) } : {});
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   if (isLoading) {
     return (
@@ -122,6 +131,14 @@ export function SharesListPage() {
             </Link>
           ))}
         </div>
+
+        {meta && (
+          <Pagination
+            currentPage={meta.current_page}
+            lastPage={meta.last_page}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </div>
   );

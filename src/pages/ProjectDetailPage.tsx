@@ -85,11 +85,11 @@ export function ProjectDetailPage() {
 
         <article className="space-y-8">
           {project.featured_image && (
-            <div className="relative h-64 md:h-96 overflow-hidden rounded-lg bg-muted">
+            <div className="rounded-lg overflow-hidden border border-emerald-500/20">
               <img
                 src={project.featured_image}
                 alt={project.title}
-                className="w-full h-full object-cover"
+                className="w-full max-h-[400px] object-contain"
               />
             </div>
           )}
