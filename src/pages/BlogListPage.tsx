@@ -1,12 +1,21 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import { Pagination } from "@/components/ui/pagination";
 import { Calendar, Clock, ArrowRight, Loader2, FileText } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useBlogs } from "@/hooks/useQueries";
 
 export function BlogListPage() {
-	const { data, isLoading, error } = useBlogs();
+	const [page, setPage] = useState(1);
+	const { data, isLoading, error } = useBlogs(page);
 	const posts = data?.data ?? [];
+	const meta = data?.meta;
+
+	function handlePageChange(newPage: number) {
+		setPage(newPage);
+		window.scrollTo({ top: 0, behavior: "smooth" });
+	}
 
 	if (isLoading) {
 		return (
@@ -65,10 +74,10 @@ export function BlogListPage() {
 												src={post.featured_image}
 												alt={post.title}
 												loading="lazy"
-												className="w-full h-48 md:h-full object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+												className="w-full h-48 object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
 											/>
 										) : (
-											<div className="w-full h-48 md:h-full min-h-[160px] bg-slate-800/50 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex flex-col items-center justify-center gap-3 border-r border-emerald-500/10">
+											<div className="w-full h-48 min-h-[160px] bg-slate-800/50 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex flex-col items-center justify-center gap-3 border-r border-emerald-500/10">
 												<FileText className="h-10 w-10 text-emerald-500/40" />
 												<span className="text-xs text-muted-foreground/50 uppercase tracking-widest">
 													Article
@@ -93,7 +102,7 @@ export function BlogListPage() {
 										<CardTitle className="group-hover:text-emerald-400 transition-colors mb-2">
 											{post.title}
 										</CardTitle>
-										<CardDescription className="line-clamp-3 mb-4">
+										<CardDescription className="line-clamp-2 mb-4">
 											{post.excerpt}
 										</CardDescription>
 										<div className="mt-auto text-sm text-emerald-400 group-hover:text-emerald-300 flex items-center gap-2">
@@ -106,6 +115,14 @@ export function BlogListPage() {
 						</Link>
 					))}
 				</div>
+
+				{meta && (
+					<Pagination
+						currentPage={meta.current_page}
+						lastPage={meta.last_page}
+						onPageChange={handlePageChange}
+					/>
+				)}
 			</div>
 		</div>
 	);

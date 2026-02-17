@@ -1,12 +1,21 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Pagination } from '@/components/ui/pagination';
 import { Loader2 } from 'lucide-react';
 import { useProjects } from '@/hooks/useQueries';
 
 export function ProjectsListPage() {
-  const { data, isLoading, error } = useProjects();
+  const [page, setPage] = useState(1);
+  const { data, isLoading, error } = useProjects(page);
   const projects = data?.data ?? [];
+  const meta = data?.meta;
+
+  function handlePageChange(newPage: number) {
+    setPage(newPage);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 
   if (isLoading) {
     return (
@@ -81,6 +90,14 @@ export function ProjectsListPage() {
             </Link>
           ))}
         </div>
+
+        {meta && (
+          <Pagination
+            currentPage={meta.current_page}
+            lastPage={meta.last_page}
+            onPageChange={handlePageChange}
+          />
+        )}
       </div>
     </div>
   );
