@@ -73,7 +73,7 @@ export function GitHubActivity() {
 			href="https://github.com/Nicholasbell03"
 			target="_blank"
 			rel="noopener noreferrer"
-			className="block"
+			className="block h-full"
 		>
 			<Card className="border-emerald-500/20 h-full transition-colors hover:border-emerald-500/40">
 				<CardContent ref={ref} className="p-6 h-full flex flex-col">
