@@ -43,7 +43,7 @@ export function TechStack() {
 
 	if (isLoading) {
 		return (
-			<Card className="border-emerald-500/20 h-full md:col-span-2">
+			<Card className="border-emerald-500/20 h-full">
 				<CardContent className="p-6 flex items-center justify-center min-h-[200px]">
 					<Loader2 className="h-6 w-6 animate-spin text-emerald-500" />
 				</CardContent>
@@ -53,14 +53,14 @@ export function TechStack() {
 
 	if (!technologies || technologies.length === 0) {
 		return (
-			<Card className="border-emerald-500/20 h-full md:col-span-2">
+			<Card className="border-emerald-500/20 h-full">
 				<CardContent className="p-6" />
 			</Card>
 		);
 	}
 
 	return (
-		<Card className="border-emerald-500/20 h-full md:col-span-2">
+		<Card className="border-emerald-500/20 h-full">
 			<CardContent className="p-6 space-y-6">
 				<h2 className="text-3xl md:text-4xl font-bold">Tech Stack</h2>
 				<div className="grid grid-cols-2 md:grid-cols-3 gap-3">
