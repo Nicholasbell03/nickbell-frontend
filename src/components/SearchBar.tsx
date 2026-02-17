@@ -188,7 +188,7 @@ export function SearchBar({ mobile = false, onNavigate }: SearchBarProps) {
 					onFocus={() => {
 						if (!isOpen) open();
 					}}
-					className="w-full pl-9 pr-9 py-1.5 rounded-md bg-emerald-500/5 border border-emerald-500/20 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/40"
+					className="w-full pl-9 pr-9 py-1.5 rounded-md bg-emerald-500/5 border border-emerald-500/20 text-sm lg:text-[15px] text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-emerald-500/40"
 				/>
 				{query ? (
 					<button
@@ -247,7 +247,7 @@ function ResultsDropdown({
 	const visibleCount = getTabCount(activeTab);
 
 	return (
-		<div className="fixed top-[4.5rem] left-0 right-0 mx-auto w-full max-w-7xl px-4 z-50 md:w-3/4">
+		<div className="fixed top-[4.5rem] lg:top-[5rem] left-0 right-0 mx-auto w-full max-w-7xl px-4 z-50 md:w-3/4">
 		<div className="rounded-lg border border-emerald-500/20 bg-background shadow-lg overflow-hidden">
 			{/* Segmented control */}
 			<div className="flex justify-end px-3 py-3 border-b border-emerald-500/20">

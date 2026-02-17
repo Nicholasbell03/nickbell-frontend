@@ -99,7 +99,7 @@ export function ChatPanel() {
 						<div className="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500">
 							<MessageSquare className="h-4 w-4 text-white" />
 						</div>
-						<h2 className="text-base font-semibold text-slate-200">
+						<h2 className="text-base lg:text-[17px] font-semibold text-slate-200">
 							Nick.AI
 						</h2>
 					</div>
