@@ -1,4 +1,4 @@
-export type SourceType = 'webpage' | 'youtube' | 'x_post';
+export type SourceType = 'webpage' | 'youtube' | 'x_post' | 'linkedin';
 
 export interface ShareSummary {
   id: number;

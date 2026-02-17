@@ -2,29 +2,11 @@ import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ExternalLink, Globe, Loader2 } from "lucide-react";
-import { FaYoutube, FaXTwitter } from "react-icons/fa6";
+import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useShare } from "@/hooks/useQueries";
-import type { SourceType } from "@/types/share";
 import { safeHostname } from "@/lib/utils";
-
-function SourceIcon({
-	type,
-	className,
-}: {
-	type: SourceType;
-	className?: string;
-}) {
-	switch (type) {
-		case "youtube":
-			return <FaYoutube className={className} />;
-		case "x_post":
-			return <FaXTwitter className={className} />;
-		default:
-			return <Globe className={className} />;
-	}
-}
+import { SourceIcon } from "@/components/SourceIcon";
 
 export function ShareDetailPage() {
 	const { slug } = useParams<{ slug: string }>();
@@ -148,8 +130,7 @@ export function ShareDetailPage() {
 							</div>
 						)}
 
-					{(share.source_type === "x_post" ||
-						share.source_type === "webpage") &&
+					{share.source_type !== "youtube" &&
 						share.image_url && (
 							<a
 								href={share.url}

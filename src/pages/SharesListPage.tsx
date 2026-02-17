@@ -3,30 +3,22 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { ArrowRight, Globe, Loader2 } from 'lucide-react';
-import { FaYoutube, FaXTwitter } from 'react-icons/fa6';
+import { FaYoutube, FaXTwitter, FaLinkedin } from 'react-icons/fa6';
 import { formatDistanceToNow } from 'date-fns';
 import { useShares } from '@/hooks/useQueries';
 import type { SourceType } from '@/types/share';
 import { safeHostname, stripHtml } from '@/lib/utils';
+import { SourceIcon } from '@/components/SourceIcon';
 
-function SourceBadgeIcon({ type, className }: { type: SourceType; className?: string }) {
-  switch (type) {
-    case 'youtube':
-      return <FaYoutube className={className} />;
-    case 'x_post':
-      return <FaXTwitter className={className} />;
-    default:
-      return <Globe className={className} />;
-  }
-}
+const SOURCE_BADGE_CONFIG: Record<SourceType, { label: string; icon: React.ComponentType<{ className?: string }> }> = {
+  webpage: { label: 'Web', icon: Globe },
+  youtube: { label: 'YouTube', icon: FaYoutube },
+  x_post: { label: 'X / Twitter', icon: FaXTwitter },
+  linkedin: { label: 'LinkedIn', icon: FaLinkedin },
+};
 
 function SourceBadge({ type }: { type: SourceType }) {
-  const config = {
-    webpage: { label: 'Web', icon: Globe },
-    youtube: { label: 'YouTube', icon: FaYoutube },
-    x_post: { label: 'X / Twitter', icon: FaXTwitter },
-  }[type];
-
+  const config = SOURCE_BADGE_CONFIG[type];
   const Icon = config.icon;
 
   return (
@@ -99,7 +91,7 @@ export function SharesListPage() {
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
-                      <SourceBadgeIcon type={share.source_type} className="h-14 w-14 text-emerald-800" />
+                      <SourceIcon type={share.source_type} className="h-14 w-14 text-emerald-800" />
                     </div>
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
