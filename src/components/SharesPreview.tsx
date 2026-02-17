@@ -7,32 +7,12 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Globe, Loader2 } from "lucide-react";
-import { FaYoutube, FaXTwitter, FaLinkedin } from "react-icons/fa6";
+import { ArrowRight, Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useFeaturedShares } from "@/hooks/useQueries";
-import type { SourceType } from "@/types/share";
 import { safeHostname, stripHtml } from "@/lib/utils";
 import { useFadeInOnScroll } from "@/hooks/useFadeInOnScroll";
-
-function SourceIcon({
-	type,
-	className,
-}: {
-	type: SourceType;
-	className?: string;
-}) {
-	switch (type) {
-		case "youtube":
-			return <FaYoutube className={className} />;
-		case "x_post":
-			return <FaXTwitter className={className} />;
-		case "linkedin":
-			return <FaLinkedin className={className} />;
-		default:
-			return <Globe className={className} />;
-	}
-}
+import { SourceIcon } from "@/components/SourceIcon";
 
 export function SharesPreview() {
 	const [fadeInRef, fadeInClass] = useFadeInOnScroll();
