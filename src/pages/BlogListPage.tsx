@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import { Pagination } from "@/components/ui/pagination";
 import { Calendar, Clock, ArrowRight, Loader2, FileText } from "lucide-react";
@@ -7,13 +6,14 @@ import { formatDistanceToNow } from "date-fns";
 import { useBlogs } from "@/hooks/useQueries";
 
 export function BlogListPage() {
-	const [page, setPage] = useState(1);
+	const [searchParams, setSearchParams] = useSearchParams();
+	const page = Number(searchParams.get("page")) || 1;
 	const { data, isLoading, error } = useBlogs(page);
 	const posts = data?.data ?? [];
 	const meta = data?.meta;
 
 	function handlePageChange(newPage: number) {
-		setPage(newPage);
+		setSearchParams(newPage > 1 ? { page: String(newPage) } : {});
 		window.scrollTo({ top: 0, behavior: "smooth" });
 	}
 

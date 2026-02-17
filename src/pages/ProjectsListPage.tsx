@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
@@ -7,13 +6,14 @@ import { Loader2 } from 'lucide-react';
 import { useProjects } from '@/hooks/useQueries';
 
 export function ProjectsListPage() {
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = Number(searchParams.get('page')) || 1;
   const { data, isLoading, error } = useProjects(page);
   const projects = data?.data ?? [];
   const meta = data?.meta;
 
   function handlePageChange(newPage: number) {
-    setPage(newPage);
+    setSearchParams(newPage > 1 ? { page: String(newPage) } : {});
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 

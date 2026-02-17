@@ -25,7 +25,7 @@ export function Navigation() {
 	return (
 		<nav className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-emerald-500/20">
 			<div className="container mx-auto max-w-7xl px-4">
-				<div className="flex items-center h-16 lg:h-18 gap-1">
+				<div className="flex items-center h-16 lg:h-[4.5rem] gap-1">
 					<Link
 						to="/"
 						className={`flex items-center gap-2 group shrink-0 rounded-md px-3 py-1.5 transition-colors ${
