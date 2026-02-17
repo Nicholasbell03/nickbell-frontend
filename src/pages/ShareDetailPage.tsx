@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, Globe, Loader2 } from "lucide-react";
-import { FaYoutube, FaXTwitter } from "react-icons/fa6";
+import { FaYoutube, FaXTwitter, FaLinkedin } from "react-icons/fa6";
 import { format } from "date-fns";
 import { useShare } from "@/hooks/useQueries";
 import type { SourceType } from "@/types/share";
@@ -21,6 +21,8 @@ function SourceIcon({
 			return <FaYoutube className={className} />;
 		case "x_post":
 			return <FaXTwitter className={className} />;
+		case "linkedin":
+			return <FaLinkedin className={className} />;
 		default:
 			return <Globe className={className} />;
 	}
@@ -149,7 +151,8 @@ export function ShareDetailPage() {
 						)}
 
 					{(share.source_type === "x_post" ||
-						share.source_type === "webpage") &&
+						share.source_type === "webpage" ||
+						share.source_type === "linkedin") &&
 						share.image_url && (
 							<a
 								href={share.url}

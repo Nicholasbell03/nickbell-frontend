@@ -3,7 +3,7 @@ import { Card, CardDescription, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Pagination } from '@/components/ui/pagination';
 import { ArrowRight, Globe, Loader2 } from 'lucide-react';
-import { FaYoutube, FaXTwitter } from 'react-icons/fa6';
+import { FaYoutube, FaXTwitter, FaLinkedin } from 'react-icons/fa6';
 import { formatDistanceToNow } from 'date-fns';
 import { useShares } from '@/hooks/useQueries';
 import type { SourceType } from '@/types/share';
@@ -15,6 +15,8 @@ function SourceBadgeIcon({ type, className }: { type: SourceType; className?: st
       return <FaYoutube className={className} />;
     case 'x_post':
       return <FaXTwitter className={className} />;
+    case 'linkedin':
+      return <FaLinkedin className={className} />;
     default:
       return <Globe className={className} />;
   }
@@ -25,6 +27,7 @@ function SourceBadge({ type }: { type: SourceType }) {
     webpage: { label: 'Web', icon: Globe },
     youtube: { label: 'YouTube', icon: FaYoutube },
     x_post: { label: 'X / Twitter', icon: FaXTwitter },
+    linkedin: { label: 'LinkedIn', icon: FaLinkedin },
   }[type];
 
   const Icon = config.icon;

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Globe, Loader2 } from "lucide-react";
-import { FaYoutube, FaXTwitter } from "react-icons/fa6";
+import { FaYoutube, FaXTwitter, FaLinkedin } from "react-icons/fa6";
 import { formatDistanceToNow } from "date-fns";
 import { useFeaturedShares } from "@/hooks/useQueries";
 import type { SourceType } from "@/types/share";
@@ -27,6 +27,8 @@ function SourceIcon({
 			return <FaYoutube className={className} />;
 		case "x_post":
 			return <FaXTwitter className={className} />;
+		case "linkedin":
+			return <FaLinkedin className={className} />;
 		default:
 			return <Globe className={className} />;
 	}
