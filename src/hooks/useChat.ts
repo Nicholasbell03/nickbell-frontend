@@ -10,7 +10,12 @@ function loadMessages(): ChatMessage[] {
 		const stored = localStorage.getItem(MESSAGES_KEY);
 		if (stored) {
 			const parsed = JSON.parse(stored);
-			if (Array.isArray(parsed)) return parsed;
+			if (Array.isArray(parsed)) {
+				return parsed.map((m: ChatMessage) => ({
+					...m,
+					id: m.id ?? crypto.randomUUID(),
+				}));
+			}
 		}
 	} catch {
 		// localStorage unavailable or corrupt
@@ -251,7 +256,7 @@ export function useChat() {
 	};
 
 	const sendMessage = useCallback(async (text: string) => {
-		const userMessage: ChatMessage = { role: "user", content: text };
+		const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", content: text };
 		setMessages((prev) => {
 			const updated = [...prev, userMessage];
 			saveMessages(updated);
@@ -295,6 +300,7 @@ export function useChat() {
 			}
 
 			const assistantMessage: ChatMessage = {
+				id: crypto.randomUUID(),
 				role: "assistant",
 				content: "",
 			};

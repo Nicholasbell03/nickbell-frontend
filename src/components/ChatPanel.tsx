@@ -143,7 +143,7 @@ export function ChatPanel() {
 						<>
 							{messages.map((message, index) => (
 								<ChatMessage
-									key={index}
+									key={message.id}
 									role={message.role}
 									content={message.content}
 									references={message.references}

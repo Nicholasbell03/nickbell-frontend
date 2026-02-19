@@ -39,7 +39,7 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 
 				return Math.min(next, target);
 			});
-		}, 40);
+		}, 25);
 
 		return () => clearInterval(interval);
 	}, [fullText]);
