@@ -228,6 +228,7 @@ export const HeroSection = () => {
 						aria-expanded={showSuggestions && filteredSuggestions.length > 0}
 						aria-haspopup="listbox"
 						aria-owns="suggestions-listbox"
+						aria-controls="suggestions-listbox"
 					>
 						<div className="relative group">
 							<div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-20 group-hover:opacity-30 blur transition duration-300"></div>
