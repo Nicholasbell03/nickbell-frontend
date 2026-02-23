@@ -142,15 +142,15 @@ export function ProjectDetailPage() {
             />
           )}
 
-          {relatedData?.data.next && (
-            <div className="border-t border-emerald-500/20 pt-8">
-              <UpNext item={relatedData.data.next} />
-            </div>
-          )}
-
           {relatedData?.data.related && relatedData.data.related.length > 0 && (
             <div className="border-t border-emerald-500/20 pt-8">
               <RelatedItems items={relatedData.data.related} />
+            </div>
+          )}
+
+          {relatedData?.data.next && (
+            <div className="border-t border-emerald-500/20 pt-8 flex justify-end">
+              <UpNext item={relatedData.data.next} />
             </div>
           )}
 
