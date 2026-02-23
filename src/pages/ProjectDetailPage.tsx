@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, ExternalLink, Github, Loader2, Eye } from 'lucide-react';
 import { getPreviewToken } from '@/services/api';
-import { useProject } from '@/hooks/useQueries';
+import { useProject, useRelatedContent } from '@/hooks/useQueries';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
+import { UpNext } from '@/components/UpNext';
+import { RelatedItems } from '@/components/RelatedItems';
 
 export function ProjectDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const previewToken = getPreviewToken();
   const { data, isLoading, error } = useProject(slug, previewToken);
+  const { data: relatedData } = useRelatedContent('project', slug);
   const project = data?.data ?? null;
 
   const sanitizedLongDescription = useMemo(
@@ -138,6 +141,27 @@ export function ProjectDetailPage() {
               dangerouslySetInnerHTML={{ __html: sanitizedLongDescription }}
             />
           )}
+
+          {relatedData?.data.next && (
+            <div className="border-t border-emerald-500/20 pt-8">
+              <UpNext item={relatedData.data.next} />
+            </div>
+          )}
+
+          {relatedData?.data.related && relatedData.data.related.length > 0 && (
+            <div className="border-t border-emerald-500/20 pt-8">
+              <RelatedItems items={relatedData.data.related} />
+            </div>
+          )}
+
+          <div className="border-t border-emerald-500/20 pt-8 flex justify-between">
+            <Link to="/projects">
+              <Button variant="outline" className="group">
+                <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+                All Projects
+              </Button>
+            </Link>
+          </div>
         </article>
       </div>
     </div>

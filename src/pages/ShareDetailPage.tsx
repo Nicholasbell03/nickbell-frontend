@@ -4,14 +4,17 @@ import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { format } from "date-fns";
-import { useShare } from "@/hooks/useQueries";
+import { useShare, useRelatedContent } from "@/hooks/useQueries";
 import { safeHostname } from "@/lib/utils";
 import { SourceIcon } from "@/components/SourceIcon";
+import { UpNext } from "@/components/UpNext";
+import { RelatedItems } from "@/components/RelatedItems";
 
 export function ShareDetailPage() {
 	const { slug } = useParams<{ slug: string }>();
 	const navigate = useNavigate();
 	const { data, isLoading, error } = useShare(slug);
+	const { data: relatedData } = useRelatedContent("share", slug);
 	const share = data?.data ?? null;
 
 	const sanitizedCommentary = useMemo(
@@ -169,6 +172,18 @@ export function ShareDetailPage() {
 						<p className="text-xl text-muted-foreground">
 							{share.description}
 						</p>
+					)}
+
+					{relatedData?.data.next && (
+						<div className="border-t border-emerald-500/20 pt-8">
+							<UpNext item={relatedData.data.next} />
+						</div>
+					)}
+
+					{relatedData?.data.related && relatedData.data.related.length > 0 && (
+						<div className="border-t border-emerald-500/20 pt-8">
+							<RelatedItems items={relatedData.data.related} />
+						</div>
 					)}
 
 					<div className="border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 justify-between">

@@ -4,14 +4,17 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { getPreviewToken } from '@/services/api';
-import { useBlog } from '@/hooks/useQueries';
+import { useBlog, useRelatedContent } from '@/hooks/useQueries';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
+import { UpNext } from '@/components/UpNext';
+import { RelatedItems } from '@/components/RelatedItems';
 
 export function BlogPostDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const previewToken = getPreviewToken();
   const { data, isLoading, error } = useBlog(slug, previewToken);
+  const { data: relatedData } = useRelatedContent('blog', slug);
   const post = data?.data ?? null;
 
   const sanitizedContent = useMemo(
@@ -116,6 +119,18 @@ export function BlogPostDetailPage() {
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           </div>
+
+          {relatedData?.data.next && (
+            <div className="border-t border-emerald-500/20 pt-8">
+              <UpNext item={relatedData.data.next} />
+            </div>
+          )}
+
+          {relatedData?.data.related && relatedData.data.related.length > 0 && (
+            <div className="border-t border-emerald-500/20 pt-8">
+              <RelatedItems items={relatedData.data.related} />
+            </div>
+          )}
 
           <div className="border-t border-emerald-500/20 pt-8 flex justify-between">
             <Link to="/blog">

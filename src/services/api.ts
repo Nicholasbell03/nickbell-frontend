@@ -1,6 +1,7 @@
 import type { Blog, BlogSummary, PaginatedResponse } from "@/types/blog";
 import type { GitHubActivity } from "@/types/github";
 import type { Project, ProjectSummary } from "@/types/project";
+import type { ContentType, RelatedContentResponse } from "@/types/related";
 import type { SearchResults, SearchType } from "@/types/search";
 import type { Share, ShareSummary } from "@/types/share";
 import type { Technology } from "@/types/technology";
@@ -132,6 +133,24 @@ export const searchApi = {
 		const params = new URLSearchParams({ q: query, type });
 		return fetchApi<{ data: SearchResults }>(
 			`/api/v1/search?${params.toString()}`,
+		);
+	},
+};
+
+const contentTypeToPath: Record<ContentType, string> = {
+	blog: "blogs",
+	project: "projects",
+	share: "shares",
+};
+
+export const relatedApi = {
+	async getForItem(
+		type: ContentType,
+		slug: string,
+	): Promise<RelatedContentResponse> {
+		const path = contentTypeToPath[type];
+		return fetchApi<RelatedContentResponse>(
+			`/api/v1/${path}/${slug}/related`,
 		);
 	},
 };
