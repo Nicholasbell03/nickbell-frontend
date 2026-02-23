@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { blogApi, githubApi, projectApi, searchApi, shareApi, technologyApi } from '@/services/api';
+import { blogApi, githubApi, projectApi, relatedApi, searchApi, shareApi, technologyApi } from '@/services/api';
+import type { ContentType } from '@/types/related';
 import type { SearchType } from '@/types/search';
 
 /**
@@ -39,6 +40,10 @@ export const queryKeys = {
   },
   technologies: {
     all: ['technologies'] as const,
+  },
+  related: {
+    all: ['related'] as const,
+    item: (type: ContentType, slug: string | undefined) => [...queryKeys.related.all, type, slug] as const,
   },
   search: {
     all: ['search'] as const,
@@ -170,6 +175,18 @@ export function useTechnologies() {
   return useQuery({
     queryKey: queryKeys.technologies.all,
     queryFn: () => technologyApi.getAll(),
+    staleTime: 60 * 60 * 1000, // 1 hour
+  });
+}
+
+/**
+ * Fetch related content (next item + similar items) for a detail page
+ */
+export function useRelatedContent(type: ContentType, slug: string | undefined) {
+  return useQuery({
+    queryKey: queryKeys.related.item(type, slug),
+    queryFn: () => relatedApi.getForItem(type, slug!),
+    enabled: !!slug,
     staleTime: 60 * 60 * 1000, // 1 hour
   });
 }
