@@ -48,7 +48,7 @@ export const HeroSection = () => {
 	const [focusedIndex, setFocusedIndex] = useState(-1);
 	const formRef = useRef<HTMLFormElement>(null);
 	const wrapperRef = useRef<HTMLDivElement>(null);
-	const { messages, sendMessage, clearChat, openPanel, setHeroInputVisible } =
+	const { messages, sendMessage, clearChat, openPanel, isPanelOpen, setHeroInputVisible } =
 		useChatContext();
 
 	const placeholderText = useTypewriter({
@@ -57,6 +57,7 @@ export const HeroSection = () => {
 		deleteSpeed: 40,
 		delayBetweenWords: 2000,
 		loop: true,
+		paused: isPanelOpen,
 	});
 
 	const filteredSuggestions = useMemo(
