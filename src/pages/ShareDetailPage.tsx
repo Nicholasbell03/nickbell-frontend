@@ -180,12 +180,6 @@ export function ShareDetailPage() {
 						</div>
 					)}
 
-					{relatedData?.data.next && (
-						<div className="border-t border-emerald-500/20 pt-8 flex justify-end">
-							<UpNext item={relatedData.data.next} />
-						</div>
-					)}
-
 					<div className="border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 justify-between">
 						<Link to="/shares">
 							<Button variant="outline" className="group">
@@ -193,16 +187,21 @@ export function ShareDetailPage() {
 								All Shares
 							</Button>
 						</Link>
-						<a
-							href={share.url}
-							target="_blank"
-							rel="noopener noreferrer"
-						>
-							<Button className="bg-emerald-600 hover:bg-emerald-700 group">
-								Visit Original
-								<ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-							</Button>
-						</a>
+						<div className="flex flex-wrap gap-4">
+							{relatedData?.data.next && (
+								<UpNext item={relatedData.data.next} />
+							)}
+							<a
+								href={share.url}
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								<Button className="bg-emerald-600 hover:bg-emerald-700 group">
+									Visit Original
+									<ExternalLink className="ml-2 h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+								</Button>
+							</a>
+						</div>
 					</div>
 				</article>
 			</div>

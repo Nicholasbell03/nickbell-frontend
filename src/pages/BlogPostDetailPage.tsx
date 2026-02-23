@@ -126,12 +126,6 @@ export function BlogPostDetailPage() {
             </div>
           )}
 
-          {relatedData?.data.next && (
-            <div className="border-t border-emerald-500/20 pt-8 flex justify-end">
-              <UpNext item={relatedData.data.next} />
-            </div>
-          )}
-
           <div className="border-t border-emerald-500/20 pt-8 flex justify-between">
             <Link to="/blog">
               <Button variant="outline" className="group">
@@ -139,6 +133,9 @@ export function BlogPostDetailPage() {
                 All Posts
               </Button>
             </Link>
+            {relatedData?.data.next && (
+              <UpNext item={relatedData.data.next} />
+            )}
           </div>
         </article>
       </div>
