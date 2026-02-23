@@ -6,6 +6,7 @@ interface UseTypewriterOptions {
   deleteSpeed?: number;
   delayBetweenWords?: number;
   loop?: boolean;
+  paused?: boolean;
 }
 
 export const useTypewriter = ({
@@ -14,6 +15,7 @@ export const useTypewriter = ({
   deleteSpeed = 50,
   delayBetweenWords = 2000,
   loop = true,
+  paused = false,
 }: UseTypewriterOptions) => {
   const [text, setText] = useState('');
   const [wordIndex, setWordIndex] = useState(0);
@@ -22,7 +24,7 @@ export const useTypewriter = ({
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    if (words.length === 0) return;
+    if (words.length === 0 || paused) return;
 
     const currentWord = words[wordIndex];
 
@@ -65,7 +67,7 @@ export const useTypewriter = ({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [text, wordIndex, isDeleting, isPaused, words, typeSpeed, deleteSpeed, delayBetweenWords, loop]);
+  }, [text, wordIndex, isDeleting, isPaused, words, typeSpeed, deleteSpeed, delayBetweenWords, loop, paused]);
 
   return text;
 };
