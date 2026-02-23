@@ -43,7 +43,7 @@ export const queryKeys = {
   },
   related: {
     all: ['related'] as const,
-    item: (type: ContentType, slug: string) => [...queryKeys.related.all, type, slug] as const,
+    item: (type: ContentType, slug: string | undefined) => [...queryKeys.related.all, type, slug] as const,
   },
   search: {
     all: ['search'] as const,
@@ -184,7 +184,7 @@ export function useTechnologies() {
  */
 export function useRelatedContent(type: ContentType, slug: string | undefined) {
   return useQuery({
-    queryKey: queryKeys.related.item(type, slug!),
+    queryKey: queryKeys.related.item(type, slug),
     queryFn: () => relatedApi.getForItem(type, slug!),
     enabled: !!slug,
     staleTime: 60 * 60 * 1000, // 1 hour

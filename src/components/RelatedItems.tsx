@@ -1,18 +1,8 @@
 import { Link } from 'react-router-dom';
-import { FileText, Briefcase, Share2 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import type { ContentType, RelatedItem } from '@/types/related';
-
-const typeConfig: Record<ContentType, { icon: typeof FileText; path: string; label: string }> = {
-  blog: { icon: FileText, path: '/blog', label: 'Blog' },
-  project: { icon: Briefcase, path: '/projects', label: 'Project' },
-  share: { icon: Share2, path: '/shares', label: 'Share' },
-};
-
-function getItemPath(item: RelatedItem): string {
-  return `${typeConfig[item.type].path}/${item.slug}`;
-}
+import { contentTypeConfig, getItemPath } from '@/lib/contentType';
+import type { RelatedItem } from '@/types/related';
 
 export function RelatedItems({ items }: { items: RelatedItem[] }) {
   if (items.length === 0) return null;
@@ -24,7 +14,7 @@ export function RelatedItems({ items }: { items: RelatedItem[] }) {
       </h3>
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {items.map((item, index) => {
-          const config = typeConfig[item.type];
+          const config = contentTypeConfig[item.type];
           const Icon = config.icon;
 
           return (

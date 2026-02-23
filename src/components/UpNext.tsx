@@ -1,19 +1,10 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, FileText, Briefcase, Share2 } from 'lucide-react';
-import type { ContentType, UpNextItem } from '@/types/related';
-
-const typeConfig: Record<ContentType, { icon: typeof FileText; path: string; label: string }> = {
-  blog: { icon: FileText, path: '/blog', label: 'Blog' },
-  project: { icon: Briefcase, path: '/projects', label: 'Project' },
-  share: { icon: Share2, path: '/shares', label: 'Share' },
-};
-
-function getItemPath(item: UpNextItem): string {
-  return `${typeConfig[item.type].path}/${item.slug}`;
-}
+import { ArrowRight } from 'lucide-react';
+import { contentTypeConfig, getItemPath } from '@/lib/contentType';
+import type { UpNextItem } from '@/types/related';
 
 export function UpNext({ item }: { item: UpNextItem }) {
-  const config = typeConfig[item.type];
+  const config = contentTypeConfig[item.type];
   const Icon = config.icon;
 
   return (
