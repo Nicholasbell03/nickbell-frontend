@@ -25,6 +25,5 @@ export function useMermaid(
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- containerRef is a stable ref object
-  }, [html]);
+  }, [containerRef, html]);
 }
