@@ -99,3 +99,15 @@ body {
 .scrollbar-track-transparent::-webkit-scrollbar-track {
   background-color: transparent;
 }
+
+/* Mermaid diagrams — override prose styles */
+.prose pre.mermaid {
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.prose .mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
