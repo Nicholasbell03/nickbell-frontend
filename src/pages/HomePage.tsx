@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { HeroSection } from "@/components/HeroSection";
 import { TechStack } from "@/components/TechStack";
 import { GitHubActivity } from "@/components/GitHubActivity";
@@ -7,6 +8,11 @@ import { SharesPreview } from "@/components/SharesPreview";
 import { useFadeInOnScroll } from "@/hooks/useFadeInOnScroll";
 
 export function HomePage() {
+	// Preload mermaid in the background so it's cached before users navigate to
+	// project/blog pages with diagrams.
+	useEffect(() => {
+		import("mermaid").catch(() => {});
+	}, []);
 	const [githubRef, githubFade] = useFadeInOnScroll();
 	const [techRef, techFade] = useFadeInOnScroll();
 
