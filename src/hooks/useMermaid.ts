@@ -13,15 +13,18 @@ export function useMermaid(
 
     let cancelled = false;
 
-    import('mermaid').then(({ default: mermaid }) => {
-      if (cancelled) return;
+    import('mermaid')
+      .then(({ default: mermaid }) => {
+        if (cancelled) return;
 
-      mermaid.initialize({ startOnLoad: false, theme: 'dark' });
-      mermaid.run({ nodes, suppressErrors: true });
-    });
+        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
+        mermaid.run({ nodes, suppressErrors: true });
+      })
+      .catch(() => {});
 
     return () => {
       cancelled = true;
     };
-  }, [containerRef, html]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- containerRef is a stable ref object
+  }, [html]);
 }
