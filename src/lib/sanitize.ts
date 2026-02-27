@@ -11,8 +11,29 @@ const CMS_PURIFY_CONFIG = {
 };
 
 /**
+ * Escape the inner content of `<pre class="mermaid">` blocks so that tags
+ * like `<br/>` (used by mermaid for line-breaks in labels) are preserved as
+ * literal text instead of being parsed as HTML by the browser.  Mermaid reads
+ * the element's `textContent`, so the browser's entity-decoding restores the
+ * original characters before mermaid ever sees them.
+ */
+function escapeMermaidBlocks(html: string): string {
+  return html.replace(
+    /<pre class="mermaid">([\s\S]*?)<\/pre>/g,
+    (_, content: string) => {
+      const escaped = content
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return `<pre class="mermaid">${escaped}</pre>`;
+    },
+  );
+}
+
+/**
  * Sanitise trusted CMS HTML content (with SVG support).
  */
 export function sanitizeCmsHtml(html: string): string {
-  return DOMPurify.sanitize(html, CMS_PURIFY_CONFIG) as string;
+  const sanitized = DOMPurify.sanitize(html, CMS_PURIFY_CONFIG) as string;
+  return escapeMermaidBlocks(sanitized);
 }
