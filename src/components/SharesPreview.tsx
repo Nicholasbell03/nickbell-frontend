@@ -104,7 +104,7 @@ export function SharesPreview() {
 									</CardTitle>
 									{(share.summary || share.commentary) && (
 										<CardDescription className={share.summary ? "" : "line-clamp-2"}>
-											{share.summary ?? stripHtml(share.commentary!)}
+											{share.summary ?? stripHtml(share.commentary ?? '')}
 										</CardDescription>
 									)}
 								</CardHeader>
