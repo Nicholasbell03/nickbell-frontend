@@ -106,8 +106,8 @@ export function SharesListPage() {
                   <CardTitle className="text-lg group-hover:text-emerald-400 transition-colors mb-2">
                     {share.title ?? safeHostname(share.url)}
                   </CardTitle>
-                  {share.commentary && (
-                    <CardDescription className="line-clamp-3 mb-4">{stripHtml(share.commentary)}</CardDescription>
+                  {(share.summary || share.commentary) && (
+                    <CardDescription className={share.summary ? "mb-4" : "line-clamp-3 mb-4"}>{share.summary ?? stripHtml(share.commentary!)}</CardDescription>
                   )}
                   <div className="mt-auto flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
