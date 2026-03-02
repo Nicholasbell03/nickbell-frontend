@@ -11,6 +11,7 @@ export interface ShareSummary {
   site_name: string | null;
   author: string | null;
   commentary: string | null;
+  summary: string | null;
   created_at: string;
 }
 

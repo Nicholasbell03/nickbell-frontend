@@ -102,9 +102,9 @@ export function SharesPreview() {
 									<CardTitle className="text-lg group-hover:text-emerald-400 transition-colors">
 										{share.title ?? safeHostname(share.url)}
 									</CardTitle>
-									{share.commentary && (
-										<CardDescription className="line-clamp-2">
-											{stripHtml(share.commentary)}
+									{(share.summary || share.commentary) && (
+										<CardDescription className={share.summary ? "" : "line-clamp-2"}>
+											{share.summary ?? stripHtml(share.commentary ?? '')}
 										</CardDescription>
 									)}
 								</CardHeader>
