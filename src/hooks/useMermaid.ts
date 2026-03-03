@@ -1,4 +1,5 @@
 import { useEffect, type RefObject } from 'react';
+import { renderMermaid } from '@/lib/mermaid';
 
 export function useMermaid(
   containerRef: RefObject<HTMLDivElement | null>,
@@ -6,24 +7,8 @@ export function useMermaid(
 ) {
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !html) return;
 
-    const nodes = container.querySelectorAll<HTMLPreElement>('pre.mermaid');
-    if (nodes.length === 0) return;
-
-    let cancelled = false;
-
-    import('mermaid')
-      .then(({ default: mermaid }) => {
-        if (cancelled) return;
-
-        mermaid.initialize({ startOnLoad: false, theme: 'dark' });
-        mermaid.run({ nodes, suppressErrors: true });
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
+    renderMermaid(container).catch(() => {});
   }, [containerRef, html]);
 }
