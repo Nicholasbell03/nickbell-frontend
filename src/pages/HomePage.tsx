@@ -9,7 +9,7 @@ import { preloadMermaid } from "@/lib/mermaid";
 
 // Preload mermaid in the background so it's cached and initialized before
 // users navigate to project/blog pages with diagrams.
-preloadMermaid();
+if (typeof window !== "undefined") preloadMermaid();
 
 export function HomePage() {
 	const [githubRef, githubFade] = useFadeInOnScroll();

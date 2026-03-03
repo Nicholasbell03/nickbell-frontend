@@ -25,7 +25,11 @@ export async function renderMermaid(container: HTMLElement) {
   renderQueue = renderQueue.then(async () => {
     const nodes = container.querySelectorAll<HTMLElement>('pre.mermaid:not([data-processed])');
     if (nodes.length === 0) return;
-    await mermaid.run({ nodes, suppressErrors: true });
+    try {
+      await mermaid.run({ nodes, suppressErrors: true });
+    } catch {
+      // Swallow so the queue stays usable for future renders
+    }
   });
 
   return renderQueue;
