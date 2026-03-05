@@ -100,7 +100,11 @@ body {
   background-color: transparent;
 }
 
-/* Mermaid diagrams — override prose styles */
+/* Mermaid diagrams — hide raw text until rendered, override prose styles */
+pre.mermaid:not([data-processed]) {
+  visibility: hidden;
+}
+
 .prose pre.mermaid {
   background: transparent;
   border: none;

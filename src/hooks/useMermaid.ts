@@ -9,23 +9,6 @@ export function useMermaid(
     const container = containerRef.current;
     if (!container || !html) return;
 
-    let cancelled = false;
-    const timers: number[] = [];
-
-    const run = () => {
-      if (cancelled) return;
-      renderMermaid(container).catch(() => {});
-    };
-
-    // Run immediately, then retry shortly after mount/update to cover
-    // delayed DOM/content paint on first load and route transitions.
-    run();
-    timers.push(window.setTimeout(run, 120));
-    timers.push(window.setTimeout(run, 400));
-
-    return () => {
-      cancelled = true;
-      timers.forEach((timer) => window.clearTimeout(timer));
-    };
+    renderMermaid(container).catch(() => {});
   }, [containerRef, html]);
 }
