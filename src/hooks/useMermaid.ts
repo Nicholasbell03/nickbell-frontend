@@ -9,6 +9,8 @@ export function useMermaid(
     const container = containerRef.current;
     if (!container || !html) return;
 
-    renderMermaid(container).catch(() => {});
+    renderMermaid(container).catch((err) => {
+      console.error('Mermaid init failed:', err);
+    });
   }, [containerRef, html]);
 }
