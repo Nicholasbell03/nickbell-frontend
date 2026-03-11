@@ -21,6 +21,9 @@ export const ChatMessage = ({
 	const isUser = role === "user";
 	const displayedContent = useStreamedText(content, !!isStreaming && !isUser);
 	const isBufferDrained = displayedContent.length >= content.length;
+
+	// Hide leftover empty assistant bubbles after streaming ends (e.g. error popped the message)
+	if (!isUser && !content && !isStreaming && !references?.length) return null;
 	const showReferences =
 		!isUser && !isStreaming && isBufferDrained && references && references.length > 0;
 

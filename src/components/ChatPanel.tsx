@@ -2,11 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { MessageSquare, Plus, X, Search, Square } from "lucide-react";
 import { useChatContext } from "@/context/ChatContext";
 import { ChatMessage } from "@/components/ChatMessage";
+import { ThinkingIndicator } from "@/components/ThinkingIndicator";
 
 export function ChatPanel() {
 	const {
 		messages,
 		isStreaming,
+		hasFirstToken,
 		error,
 		sendMessage,
 		stopStreaming,
@@ -149,22 +151,15 @@ export function ChatPanel() {
 									references={message.references}
 									isStreaming={
 										isStreaming &&
+										hasFirstToken &&
 										message.role === "assistant" &&
 										index === messages.length - 1
 									}
 								/>
 							))}
-							{isStreaming &&
-								messages[messages.length - 1]?.role ===
-									"user" && (
-									<div className="flex gap-4 mb-6 animate-fade-in">
-										<div className="flex items-center gap-1.5 pl-14">
-											<div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-											<div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-											<div className="h-2 w-2 bg-emerald-400 rounded-full animate-bounce" />
-										</div>
-									</div>
-								)}
+							{isStreaming && !hasFirstToken && (
+								<ThinkingIndicator />
+							)}
 							<div ref={messagesEndRef} />
 						</>
 					)}

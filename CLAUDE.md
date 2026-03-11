@@ -13,6 +13,8 @@ yarn preview    # Preview production build locally
 
 This project uses Yarn 4 (Berry) with Plug'n'Play (see .pnp.cjs).
 
+**Shell commands:** Do not prefix commands with `cd` into the project directory — it is already the working directory. Run commands directly (e.g. `git status`, `yarn build`).
+
 ## Architecture
 
 This is a personal portfolio website built with React 19, TypeScript, and Vite.

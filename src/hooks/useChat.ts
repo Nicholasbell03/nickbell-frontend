@@ -219,6 +219,7 @@ function deduplicateReferences(refs: ContentReference[]): ContentReference[] {
 export function useChat() {
 	const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
 	const [isStreaming, setIsStreaming] = useState(false);
+	const [hasFirstToken, setHasFirstToken] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const prevStreamingRef = useRef(false);
@@ -263,6 +264,7 @@ export function useChat() {
 			return updated;
 		});
 		setIsStreaming(true);
+		setHasFirstToken(false);
 		setError(null);
 
 		const abortController = new AbortController();
@@ -315,6 +317,7 @@ export function useChat() {
 
 			const decoder = new TextDecoder();
 			let buffer = "";
+			let firstTokenSeen = false;
 
 			while (true) {
 				const { done, value } = await reader.read();
@@ -346,6 +349,10 @@ export function useChat() {
 							});
 							break;
 						} else if (event.type === "text_delta" && event.delta) {
+							if (!firstTokenSeen) {
+								setHasFirstToken(true);
+								firstTokenSeen = true;
+							}
 							setMessages((prev) => {
 								const updated = [...prev];
 								const last = updated[updated.length - 1];
@@ -412,6 +419,7 @@ export function useChat() {
 		} finally {
 			clearTimeout(timeoutId);
 			setIsStreaming(false);
+			setHasFirstToken(false);
 			abortControllerRef.current = null;
 		}
 	}, []);
@@ -430,6 +438,7 @@ export function useChat() {
 	return {
 		messages,
 		isStreaming,
+		hasFirstToken,
 		error,
 		sendMessage,
 		stopStreaming,
