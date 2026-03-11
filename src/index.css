@@ -115,3 +115,21 @@ pre.mermaid:not([data-processed]) {
   max-width: 100%;
   height: auto;
 }
+
+/* Skeleton shimmer for thinking indicator */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(148, 163, 184, 0.15) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  background-color: rgba(51, 65, 85, 0.5);
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

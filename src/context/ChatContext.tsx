@@ -11,6 +11,7 @@ interface ChatContextValue {
 	// Chat state & actions from useChat
 	messages: ReturnType<typeof useChat>["messages"];
 	isStreaming: ReturnType<typeof useChat>["isStreaming"];
+	hasFirstToken: ReturnType<typeof useChat>["hasFirstToken"];
 	error: ReturnType<typeof useChat>["error"];
 	sendMessage: ReturnType<typeof useChat>["sendMessage"];
 	stopStreaming: ReturnType<typeof useChat>["stopStreaming"];

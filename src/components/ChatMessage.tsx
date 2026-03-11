@@ -21,6 +21,9 @@ export const ChatMessage = ({
 	const isUser = role === "user";
 	const displayedContent = useStreamedText(content, !!isStreaming && !isUser);
 	const isBufferDrained = displayedContent.length >= content.length;
+
+	// Hide empty assistant bubbles during the thinking phase (before first token arrives)
+	if (!isUser && !content && !isStreaming) return null;
 	const showReferences =
 		!isUser && !isStreaming && isBufferDrained && references && references.length > 0;
 
