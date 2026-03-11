@@ -37,6 +37,13 @@
   --animate-fade-in: fade-in 0.5s ease-out forwards;
   --animate-fade-in-delay: fade-in-delay 0.5s ease-out 0.2s forwards;
   --animate-float: float 3s ease-in-out infinite;
+  --animate-thinking-bob: thinking-bob 2s ease-in-out infinite;
+  --animate-thinking-dot-1: thinking-dot 1.4s ease-in-out infinite;
+  --animate-thinking-dot-2: thinking-dot 1.4s ease-in-out 0.2s infinite;
+  --animate-thinking-dot-3: thinking-dot 1.4s ease-in-out 0.4s infinite;
+  --animate-thinking-bubble: thinking-bubble 2s ease-in-out infinite;
+  --animate-thinking-scratch: thinking-scratch 5s ease-in-out infinite;
+  --animate-thinking-antenna: thinking-antenna-pulse 1.5s ease-in-out infinite;
 
   /* Font family */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -116,20 +123,31 @@ pre.mermaid:not([data-processed]) {
   height: auto;
 }
 
-/* Skeleton shimmer for thinking indicator */
-.shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(148, 163, 184, 0.15) 50%,
-    transparent 100%
-  );
-  background-size: 200% 100%;
-  background-color: rgba(51, 65, 85, 0.5);
-  animation: shimmer 1.5s ease-in-out infinite;
+@keyframes thinking-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
 }
 
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+@keyframes thinking-dot {
+  0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-2px); }
+}
+
+@keyframes thinking-bubble {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+@keyframes thinking-antenna-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes thinking-scratch {
+  0%, 70%, 100% { transform: translateY(12px); opacity: 0; }
+  78% { transform: translateY(0); opacity: 1; }
+  82% { transform: translateY(0) rotate(-3deg); opacity: 1; }
+  86% { transform: translateY(0) rotate(3deg); opacity: 1; }
+  90% { transform: translateY(0) rotate(-2deg); opacity: 1; }
+  94% { transform: translateY(0); opacity: 1; }
 }

@@ -1,15 +1,21 @@
+import { ThinkingRobot } from "./ThinkingRobot";
+
 export function ThinkingIndicator() {
 	return (
-		<div className="flex mb-4 justify-start animate-fade-in" role="status" aria-label="Thinking...">
-			<div className="max-w-[85%] flex flex-col items-start">
-				<div className="rounded-2xl px-5 py-3 backdrop-blur-sm bg-slate-800/90 border border-slate-700/50 w-64">
-					<div className="space-y-2.5" aria-hidden="true">
-						<div className="h-3 rounded-full bg-slate-700/50 w-3/4 shimmer" />
-						<div className="h-3 rounded-full bg-slate-700/50 w-1/2 shimmer" />
-						<div className="h-3 rounded-full bg-slate-700/50 w-2/5 shimmer" />
-					</div>
-				</div>
+		<div
+			className="flex items-center gap-3 px-4 py-3 mb-4 animate-fade-in"
+			role="status"
+			aria-label="Thinking..."
+		>
+			<div className="animate-thinking-bob">
+				<ThinkingRobot className="text-emerald-500" size={36} />
 			</div>
+			<span className="text-sm text-slate-400 flex items-center gap-0.5">
+				Thinking
+				<span className="animate-thinking-dot-1">.</span>
+				<span className="animate-thinking-dot-2">.</span>
+				<span className="animate-thinking-dot-3">.</span>
+			</span>
 		</div>
 	);
 }
