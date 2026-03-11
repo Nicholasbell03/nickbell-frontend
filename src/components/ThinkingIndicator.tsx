@@ -8,7 +8,7 @@ export function ThinkingIndicator() {
 			aria-label="Thinking..."
 		>
 			<div className="animate-thinking-bob">
-				<ThinkingRobot className="text-emerald-500" size={36} />
+				<ThinkingRobot className="text-emerald-500" size={44} />
 			</div>
 			<span className="text-sm text-slate-400 flex items-center gap-0.5">
 				Thinking
