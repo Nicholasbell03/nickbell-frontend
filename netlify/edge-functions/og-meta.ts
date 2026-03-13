@@ -65,10 +65,16 @@ function absoluteImageUrl(url: string | null | undefined): string {
   return `${SITE_URL}${url.startsWith('/') ? '' : '/'}${url}`;
 }
 
-function parseRoute(pathname: string): { type: string; slug: string } | null {
+const API_PATH_MAP: Record<string, string> = {
+  blog: 'blogs',
+  projects: 'projects',
+  shares: 'shares',
+};
+
+function parseRoute(pathname: string): { type: string; apiPath: string; slug: string } | null {
   const match = pathname.match(/^\/(blog|projects|shares)\/([^/?#]+)/);
   if (!match) return null;
-  return { type: match[1], slug: match[2] };
+  return { type: match[1], apiPath: API_PATH_MAP[match[1]], slug: match[2] };
 }
 
 export default async function handler(request: Request, context: { next: () => Promise<Response> }) {
@@ -105,7 +111,7 @@ export default async function handler(request: Request, context: { next: () => P
   }
 
   try {
-    const apiUrl = `${API_BASE}/${route.type}/${route.slug}`;
+    const apiUrl = `${API_BASE}/${route.apiPath}/${route.slug}`;
     const response = await fetch(apiUrl, {
       signal: AbortSignal.timeout(5000),
     });
@@ -153,7 +159,3 @@ function crawlerResponse(og: OgData): Response {
     },
   });
 }
-
-export const config = {
-  path: ['/', '/blog/*', '/projects/*', '/shares/*'],
-};
