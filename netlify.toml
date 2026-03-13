@@ -9,6 +9,23 @@
   status = 301
   force = true
 
+# Edge function for OG meta tags (crawler detection)
+[[edge_functions]]
+  function = "og-meta"
+  path = "/"
+
+[[edge_functions]]
+  function = "og-meta"
+  path = "/blog/*"
+
+[[edge_functions]]
+  function = "og-meta"
+  path = "/projects/*"
+
+[[edge_functions]]
+  function = "og-meta"
+  path = "/shares/*"
+
 # SPA fallback (must be last)
 [[redirects]]
   from = "/*"
