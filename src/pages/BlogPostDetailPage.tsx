@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Calendar, Clock, Loader2, Eye } from 'lucide-react';
@@ -6,7 +6,6 @@ import { format } from 'date-fns';
 import { getPreviewToken } from '@/services/api';
 import { useBlog, useRelatedContent } from '@/hooks/useQueries';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
-import { useMermaid } from '@/hooks/useMermaid';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { UpNext } from '@/components/UpNext';
 import { RelatedItems } from '@/components/RelatedItems';
@@ -19,14 +18,11 @@ export function BlogPostDetailPage() {
   const { data: relatedData } = useRelatedContent('blog', slug);
   const post = data?.data ?? null;
 
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const sanitizedContent = useMemo(
     () => post?.content ? sanitizeCmsHtml(post.content) : '',
     [post],
   );
 
-  useMermaid(contentRef, sanitizedContent);
   useDocumentMeta({ title: post?.title, description: post?.meta_description ?? post?.excerpt });
 
   if (isLoading) {
@@ -122,7 +118,6 @@ export function BlogPostDetailPage() {
 
           <div className="border-t border-emerald-500/20 pt-8">
             <div
-              ref={contentRef}
               className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline prose-a:hover:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
               dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />

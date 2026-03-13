@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -6,7 +6,6 @@ import { ArrowLeft, ExternalLink, Github, Loader2, Eye } from 'lucide-react';
 import { getPreviewToken } from '@/services/api';
 import { useProject, useRelatedContent } from '@/hooks/useQueries';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
-import { useMermaid } from '@/hooks/useMermaid';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { UpNext } from '@/components/UpNext';
 import { RelatedItems } from '@/components/RelatedItems';
@@ -19,14 +18,11 @@ export function ProjectDetailPage() {
   const { data: relatedData } = useRelatedContent('project', slug);
   const project = data?.data ?? null;
 
-  const contentRef = useRef<HTMLDivElement>(null);
-
   const sanitizedLongDescription = useMemo(
     () => project?.long_description ? sanitizeCmsHtml(project.long_description) : '',
     [project],
   );
 
-  useMermaid(contentRef, sanitizedLongDescription);
   useDocumentMeta({ title: project?.title, description: project?.description });
 
   if (isLoading) {
@@ -144,7 +140,6 @@ export function ProjectDetailPage() {
 
           {project.long_description && (
             <div
-              ref={contentRef}
               className="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground prose-code:text-emerald-300 prose-pre:bg-slate-900 prose-pre:border prose-pre:border-emerald-500/20 prose-img:rounded-lg"
               dangerouslySetInnerHTML={{ __html: sanitizedLongDescription }}
             />
