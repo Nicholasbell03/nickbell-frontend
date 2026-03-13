@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
-import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useShare, useRelatedContent } from "@/hooks/useQueries";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { sanitizeCmsHtml } from "@/lib/sanitize";
 import { safeHostname } from "@/lib/utils";
 import { SourceIcon } from "@/components/SourceIcon";
 import { UpNext } from "@/components/UpNext";
@@ -21,7 +21,7 @@ export function ShareDetailPage() {
 	useDocumentMeta({ title: share?.title, description: share?.description });
 
 	const sanitizedCommentary = useMemo(
-		() => (share?.commentary ? DOMPurify.sanitize(share.commentary) : ""),
+		() => (share?.commentary ? sanitizeCmsHtml(share.commentary) : ""),
 		[share],
 	);
 
