@@ -136,7 +136,13 @@ export default async function handler(request: Request, context: { next: () => P
     }
 
     return crawlerResponse(og);
-  } catch {
+  } catch (error) {
+    console.error('Failed to build OG metadata for request', {
+      pathname,
+      route,
+      error,
+    });
+
     return crawlerResponse(defaultOgForPath(pathname));
   }
 }
