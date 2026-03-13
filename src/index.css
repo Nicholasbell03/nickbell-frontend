@@ -107,22 +107,6 @@ body {
   background-color: transparent;
 }
 
-/* Mermaid diagrams — hide raw text until rendered, override prose styles */
-pre.mermaid:not([data-processed]) {
-  visibility: hidden;
-}
-
-.prose pre.mermaid {
-  background: transparent;
-  border: none;
-  padding: 0;
-}
-
-.prose .mermaid svg {
-  max-width: 100%;
-  height: auto;
-}
-
 @keyframes thinking-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }

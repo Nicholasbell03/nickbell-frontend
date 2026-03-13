@@ -5,11 +5,6 @@ import { BlogPreview } from "@/components/BlogPreview";
 import { ProjectsPreview } from "@/components/ProjectsPreview";
 import { SharesPreview } from "@/components/SharesPreview";
 import { useFadeInOnScroll } from "@/hooks/useFadeInOnScroll";
-import { preloadMermaid } from "@/lib/mermaid";
-
-// Preload mermaid in the background so it's cached and initialized before
-// users navigate to project/blog pages with diagrams.
-if (typeof window !== "undefined") preloadMermaid();
 
 export function HomePage() {
 	const [githubRef, githubFade] = useFadeInOnScroll();
