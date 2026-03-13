@@ -7,6 +7,7 @@ import { getPreviewToken } from '@/services/api';
 import { useBlog, useRelatedContent } from '@/hooks/useQueries';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { useMermaid } from '@/hooks/useMermaid';
+import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { UpNext } from '@/components/UpNext';
 import { RelatedItems } from '@/components/RelatedItems';
 
@@ -26,6 +27,7 @@ export function BlogPostDetailPage() {
   );
 
   useMermaid(contentRef, sanitizedContent);
+  useDocumentMeta({ title: post?.title, description: post?.meta_description ?? post?.excerpt });
 
   if (isLoading) {
     return (

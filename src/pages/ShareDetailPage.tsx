@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ExternalLink, Loader2 } from "lucide-react";
 import { format } from "date-fns";
 import { useShare, useRelatedContent } from "@/hooks/useQueries";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { safeHostname } from "@/lib/utils";
 import { SourceIcon } from "@/components/SourceIcon";
 import { UpNext } from "@/components/UpNext";
@@ -16,6 +17,8 @@ export function ShareDetailPage() {
 	const { data, isLoading, error } = useShare(slug);
 	const { data: relatedData } = useRelatedContent("share", slug);
 	const share = data?.data ?? null;
+
+	useDocumentMeta({ title: share?.title, description: share?.description });
 
 	const sanitizedCommentary = useMemo(
 		() => (share?.commentary ? DOMPurify.sanitize(share.commentary) : ""),
