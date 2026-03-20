@@ -22,6 +22,10 @@ export const ChatMessage = ({
 	const displayedContent = useStreamedText(content, !!isStreaming && !isUser);
 	const isBufferDrained = displayedContent.length >= content.length;
 
+	// Hide assistant message entirely while streaming but no content has arrived yet
+	// (ThinkingIndicator covers this period; prevents reference cards flashing during tool-call phase)
+	if (!isUser && !content && isStreaming) return null;
+
 	// Hide leftover empty assistant bubbles after streaming ends (e.g. error popped the message)
 	if (!isUser && !content && !isStreaming && !references?.length) return null;
 	const showReferences =
