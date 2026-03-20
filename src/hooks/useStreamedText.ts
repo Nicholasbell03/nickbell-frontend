@@ -19,14 +19,6 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 	const isStreamingRef = useRef(isActive);
 
 	useEffect(() => {
-		// Detect false→true transition (e.g. hasFirstToken flipping mid-stream).
-		// Reset displayedLength directly so the word-by-word reveal starts fresh.
-		if (isActive && !isStreamingRef.current) {
-			isStreamingRef.current = true;
-			// eslint-disable-next-line react-hooks/set-state-in-effect
-			setDisplayedLength(0);
-		}
-
 		// Non-streaming messages (e.g. loaded from localStorage) are shown
 		// in full via the initial state value — nothing to animate.
 		if (fullText.length === 0 || !isStreamingRef.current) return;

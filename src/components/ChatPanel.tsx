@@ -151,7 +151,6 @@ export function ChatPanel() {
 									references={message.references}
 									isStreaming={
 										isStreaming &&
-										hasFirstToken &&
 										message.role === "assistant" &&
 										index === messages.length - 1
 									}
