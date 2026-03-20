@@ -2,10 +2,10 @@
   publish = "dist"
   command = "yarn build"
 
-# Redirect admin to Laravel backend using env var
+# Redirect admin to Laravel backend
 [[redirects]]
   from = "/admin/*"
-  to = "${VITE_API_URL}/admin/:splat"
+  to = "https://api.nickbell.dev/admin/:splat"
   status = 301
   force = true
 
@@ -29,7 +29,7 @@
 # RSS feed proxy to backend
 [[redirects]]
   from = "/feed"
-  to = "${VITE_API_URL}/feed"
+  to = "https://api.nickbell.dev/feed"
   status = 200
   force = true
 
