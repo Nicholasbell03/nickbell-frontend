@@ -23,6 +23,7 @@ export function useStreamedText(fullText: string, isActive: boolean): string {
 		// Reset displayedLength directly so the word-by-word reveal starts fresh.
 		if (isActive && !isStreamingRef.current) {
 			isStreamingRef.current = true;
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setDisplayedLength(0);
 		}
 

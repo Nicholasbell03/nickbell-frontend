@@ -26,6 +26,13 @@
   function = "og-meta"
   path = "/shares/*"
 
+# RSS feed proxy to backend
+[[redirects]]
+  from = "/feed"
+  to = "${VITE_API_URL}/feed"
+  status = 200
+  force = true
+
 # SPA fallback (must be last)
 [[redirects]]
   from = "/*"
