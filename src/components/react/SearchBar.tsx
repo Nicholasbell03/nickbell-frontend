@@ -21,7 +21,13 @@ function getDefaultTab(pathname: string): SearchType {
   return 'all';
 }
 
-const isMac = typeof navigator !== 'undefined' && navigator.platform.includes('Mac');
+function useIsMac() {
+  const [isMac, setIsMac] = useState(false);
+  useEffect(() => {
+    setIsMac(navigator.platform.includes('Mac'));
+  }, []);
+  return isMac;
+}
 
 function truncate(text: string | null, maxLength = 80): string {
   if (!text) return '';
@@ -48,7 +54,9 @@ function useSearch(query: string) {
       } catch {
         /* aborted or error */
       } finally {
-        setIsLoading(false);
+        if (!controller.signal.aborted) {
+          setIsLoading(false);
+        }
       }
     }, 300);
 
@@ -72,6 +80,7 @@ export default function SearchBar({ mobile = false, onNavigate }: SearchBarProps
   const [activeTab, setActiveTab] = useState<SearchType>('all');
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const isMac = useIsMac();
 
   const { results, isLoading } = useSearch(query.trim());
 
@@ -181,6 +190,7 @@ export default function SearchBar({ mobile = false, onNavigate }: SearchBarProps
             onTabChange={setActiveTab}
             getTabCount={getTabCount}
             onNavigate={handleNavigate}
+            isMac={isMac}
           />
         )}
       </div>
@@ -229,6 +239,7 @@ export default function SearchBar({ mobile = false, onNavigate }: SearchBarProps
           onTabChange={setActiveTab}
           getTabCount={getTabCount}
           onNavigate={handleNavigate}
+          isMac={isMac}
         />
       )}
     </div>
@@ -249,6 +260,7 @@ interface ResultsDropdownProps {
   onTabChange: (tab: SearchType) => void;
   getTabCount: (tab: SearchType) => number;
   onNavigate: (path: string) => void;
+  isMac: boolean;
 }
 
 function ResultsDropdown({
@@ -259,6 +271,7 @@ function ResultsDropdown({
   onTabChange,
   getTabCount,
   onNavigate,
+  isMac,
 }: ResultsDropdownProps) {
   const visibleCount = getTabCount(activeTab);
 
