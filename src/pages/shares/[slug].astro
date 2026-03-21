@@ -1,0 +1,224 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import { fetchApi } from '@/lib/api';
+import { sanitizeCmsHtml } from '@/lib/sanitize';
+import { getItemPath } from '@/lib/contentType';
+import { safeHostname } from '@/lib/utils';
+import { format } from 'date-fns';
+import type { Share } from '@/types/share';
+import type { RelatedContentResponse } from '@/types/related';
+
+const { slug } = Astro.params;
+
+let share: Share | null = null;
+let relatedData: RelatedContentResponse['data'] | null = null;
+
+try {
+  const [shareRes, relatedRes] = await Promise.all([
+    fetchApi<{ data: Share }>(`/api/v1/shares/${slug}`),
+    fetchApi<RelatedContentResponse>(`/api/v1/shares/${slug}/related`).catch(() => null),
+  ]);
+  share = shareRes.data;
+  relatedData = relatedRes?.data ?? null;
+} catch {
+  return Astro.redirect('/shares');
+}
+
+if (!share) return Astro.redirect('/shares');
+
+const sanitizedCommentary = share.commentary ? sanitizeCmsHtml(share.commentary) : '';
+
+// CDN cache: 1 day fresh, 7 days stale-while-revalidate
+Astro.response.headers.set(
+  'Netlify-CDN-Cache-Control',
+  'public, s-maxage=86400, stale-while-revalidate=604800'
+);
+---
+
+<Layout
+  title={`${share.title ?? safeHostname(share.url)} | Nicholas Bell`}
+  description={share.description ?? share.summary ?? ''}
+  image={share.image_url ?? undefined}
+  type="article"
+  publishedTime={share.created_at}
+>
+  <div class="py-16 md:py-24 px-4">
+    <div class="container mx-auto max-w-4xl">
+      <a href="/shares" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 mb-8 group hover:bg-accent hover:text-accent-foreground transition-colors">
+        <svg class="h-4 w-4 group-hover:-translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        Back
+      </a>
+
+      <article class="space-y-8">
+        <div class="space-y-4">
+          <div class="flex items-center gap-3 text-sm text-muted-foreground">
+            {share.source_type === 'youtube' && (
+              <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 576 512" fill="currentColor"><path d="M549.655 124.083c-6.281-23.65-24.787-42.276-48.284-48.597C458.781 64 288 64 288 64S117.22 64 74.629 75.486c-23.497 6.322-42.003 24.947-48.284 48.597-11.412 42.867-11.412 132.305-11.412 132.305s0 89.438 11.412 132.305c6.281 23.65 24.787 41.5 48.284 47.821C117.22 448 288 448 288 448s170.78 0 213.371-11.486c23.497-6.321 42.003-24.171 48.284-47.821 11.412-42.867 11.412-132.305 11.412-132.305s0-89.438-11.412-132.305zm-317.51 213.508V175.185l142.739 81.205-142.739 81.201z"/></svg>
+            )}
+            {share.source_type === 'x_post' && (
+              <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 512 512" fill="currentColor"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg>
+            )}
+            {share.source_type === 'linkedin' && (
+              <svg class="h-4 w-4 text-emerald-400" viewBox="0 0 448 512" fill="currentColor"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zM384.3 416h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+            )}
+            {share.source_type === 'webpage' && (
+              <svg class="h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></svg>
+            )}
+            {share.site_name && <span>{share.site_name}</span>}
+            <span>{format(new Date(share.created_at), 'MMMM d, yyyy')}</span>
+          </div>
+
+          <h1 class="text-4xl md:text-5xl font-bold leading-tight">
+            {share.title ?? safeHostname(share.url)}
+          </h1>
+        </div>
+
+        {/* Commentary */}
+        {sanitizedCommentary && (
+          <div class="border-t border-emerald-500/20 pt-8">
+            <h2 class="text-lg font-semibold mb-4 text-emerald-400">My Thoughts</h2>
+            <div
+              class="prose prose-invert prose-lg max-w-none prose-headings:text-foreground prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline prose-strong:text-foreground"
+              set:html={sanitizedCommentary}
+            />
+          </div>
+        )}
+
+        {/* YouTube embed */}
+        {share.source_type === 'youtube' && share.embed_data?.video_id && /^[\w-]{11}$/.test(share.embed_data.video_id) && (
+          <div class="aspect-video rounded-lg overflow-hidden border border-emerald-500/20">
+            <iframe
+              src={`https://www.youtube.com/embed/${share.embed_data.video_id}`}
+              title={share.title ?? 'YouTube video'}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              class="w-full h-full"
+            />
+          </div>
+        )}
+
+        {/* X/Twitter embed */}
+        {share.source_type === 'x_post' && share.embed_data?.tweet_id && (
+          <div class="flex justify-center">
+            <blockquote class="twitter-tweet" data-theme="dark">
+              <a href={`https://twitter.com/i/status/${share.embed_data.tweet_id}`}>Loading tweet...</a>
+            </blockquote>
+            <script is:inline async src="https://platform.twitter.com/widgets.js"></script>
+          </div>
+        )}
+
+        {/* Image for non-YouTube sources */}
+        {share.source_type !== 'youtube' && share.image_url && (
+          <a
+            href={share.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="block rounded-lg overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group"
+          >
+            <img
+              src={share.image_url}
+              alt={share.title ?? ''}
+              class="w-full max-h-96 object-cover group-hover:scale-[1.01] transition-transform duration-300"
+            />
+          </a>
+        )}
+
+        {/* Source link callout */}
+        <a
+          href={share.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="flex items-center gap-4 p-5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all group"
+        >
+          <svg class="h-6 w-6 text-emerald-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+          <div class="min-w-0">
+            <p class="text-sm text-muted-foreground mb-1">Visit Link</p>
+            <p class="text-emerald-400 font-medium truncate">{share.url}</p>
+          </div>
+        </a>
+
+        {/* Description */}
+        {share.description && (
+          <p class="text-xl text-muted-foreground">{share.description}</p>
+        )}
+
+        {/* Related content */}
+        {relatedData?.related && relatedData.related.length > 0 && (
+          <div class="border-t border-emerald-500/20 pt-8 space-y-4">
+            <h3 class="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              You might also like
+            </h3>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedData.related.map((item, index) => (
+                <a href={getItemPath(item)} class="block">
+                  <div
+                    class="group rounded-lg border border-emerald-500/20 bg-card shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer flex flex-col"
+                    style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
+                  >
+                    <div class="relative h-32 overflow-hidden bg-muted">
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          loading="lazy"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div class="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
+                          <svg class="h-10 w-10 text-emerald-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                        </div>
+                      )}
+                      <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                      <span class="absolute top-2 right-2 bg-background/80 text-emerald-400 border border-emerald-500/20 text-xs rounded-full px-2 py-0.5 font-medium capitalize">
+                        {item.type}
+                      </span>
+                    </div>
+                    <div class="p-4 flex-1">
+                      <h4 class="text-sm font-semibold group-hover:text-emerald-400 transition-colors line-clamp-2">
+                        {item.title}
+                      </h4>
+                      {item.description && (
+                        <p class="text-xs text-muted-foreground line-clamp-2 mt-1">
+                          {item.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Footer navigation */}
+        <div class="border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 justify-between">
+          <a href="/shares" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            <svg class="h-4 w-4 group-hover:-translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+            All Shares
+          </a>
+          <div class="flex flex-wrap gap-4">
+            {relatedData?.next && (
+              <a
+                href={getItemPath(relatedData.next)}
+                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors"
+                title={relatedData.next.title}
+              >
+                Next
+                <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            )}
+            <a
+              href={share.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white group transition-colors"
+            >
+              Visit Original
+              <svg class="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</Layout>
