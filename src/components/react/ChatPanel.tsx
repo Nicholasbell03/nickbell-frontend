@@ -19,7 +19,7 @@ export function ChatPanel() {
 
   const [query, setQuery] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -63,9 +63,35 @@ export function ChatPanel() {
       if (!query.trim() || isStreaming) return;
       sendMessage(query.trim());
       setQuery('');
+      if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+      }
     },
     [query, isStreaming, sendMessage],
   );
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (query.trim() && !isStreaming) {
+          sendMessage(query.trim());
+          setQuery('');
+          if (inputRef.current) {
+            inputRef.current.style.height = 'auto';
+          }
+        }
+      }
+    },
+    [query, isStreaming, sendMessage],
+  );
+
+  const handleInput = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setQuery(e.target.value);
+    const el = e.target;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, []);
 
   const handleNewChat = useCallback(() => {
     clearChat();
@@ -107,7 +133,7 @@ export function ChatPanel() {
             {messages.length > 0 && (
               <button
                 onClick={handleNewChat}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 rounded-lg border border-slate-700/50 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-700/80 rounded-lg border border-slate-700/50 transition-colors cursor-pointer"
                 aria-label="New chat"
               >
                 <Plus className="h-3.5 w-3.5" />
@@ -169,15 +195,16 @@ export function ChatPanel() {
         {/* Input */}
         <div className="px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 border-t border-slate-800">
           <form onSubmit={handleSubmit}>
-            <div className="relative flex items-center bg-slate-900/90 backdrop-blur-xl rounded-xl border border-slate-700/50 focus-within:border-emerald-500/30 transition-colors">
-              <Search className="absolute left-4 h-4 w-4 text-emerald-400" />
-              <input
+            <div className="relative flex items-end bg-slate-900/90 backdrop-blur-xl rounded-xl border border-slate-700/50 focus-within:border-emerald-500/30 transition-colors">
+              <Search className="absolute left-4 top-3.5 h-4 w-4 text-emerald-400" />
+              <textarea
                 ref={inputRef}
-                type="text"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={handleInput}
+                onKeyDown={handleKeyDown}
                 placeholder="Ask a question..."
-                className="w-full py-3 pl-11 pr-12 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-sm"
+                rows={1}
+                className="w-full py-3 pl-11 pr-12 bg-transparent text-slate-200 placeholder:text-slate-500 focus:outline-none text-sm resize-none max-h-[4.5rem] overflow-y-auto"
                 disabled={isStreaming}
               />
               {isStreaming ? (
