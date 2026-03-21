@@ -12,7 +12,7 @@ const token = Astro.url.searchParams.get('token');
 
 // Fetch blog and related content in parallel
 const endpoint = token ? `/api/v1/blogs/preview/${slug}` : `/api/v1/blogs/${slug}`;
-const headers = token ? { 'X-Preview-Token': token } : {};
+const headers: Record<string, string> = token ? { 'X-Preview-Token': token } : {};
 
 let post: Blog | null = null;
 let relatedData: RelatedContentResponse['data'] | null = null;

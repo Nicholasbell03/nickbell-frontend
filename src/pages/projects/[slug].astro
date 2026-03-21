@@ -11,7 +11,7 @@ const token = Astro.url.searchParams.get('token');
 
 // Fetch project and related content in parallel
 const endpoint = token ? `/api/v1/projects/preview/${slug}` : `/api/v1/projects/${slug}`;
-const headers = token ? { 'X-Preview-Token': token } : {};
+const headers: Record<string, string> = token ? { 'X-Preview-Token': token } : {};
 
 let project: Project | null = null;
 let relatedData: RelatedContentResponse['data'] | null = null;
