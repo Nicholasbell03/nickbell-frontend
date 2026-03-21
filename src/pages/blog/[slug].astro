@@ -1,5 +1,6 @@
 ---
 import Layout from '@/layouts/Layout.astro';
+import RelatedContentCard from '@/components/RelatedContentCard.astro';
 import { fetchApi } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
@@ -94,41 +95,7 @@ setCdnCache(Astro.response, token ? null : post, { sMaxAge: 604800, swr: 2592000
             </h3>
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {relatedData.related.map((item, index) => (
-                <a href={getItemPath(item)} class="block">
-                  <div
-                    class="group rounded-lg border border-emerald-500/20 bg-card shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer flex flex-col"
-                    style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
-                  >
-                    <div class="relative h-32 overflow-hidden bg-muted">
-                      {item.image ? (
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          loading="lazy"
-                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        />
-                      ) : (
-                        <div class="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
-                          <svg class="h-10 w-10 text-emerald-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
-                        </div>
-                      )}
-                      <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-                      <span class="absolute top-2 right-2 bg-background/80 text-emerald-400 border border-emerald-500/20 text-xs rounded-full px-2 py-0.5 font-medium capitalize">
-                        {item.type}
-                      </span>
-                    </div>
-                    <div class="p-4 flex-1">
-                      <h4 class="text-sm font-semibold group-hover:text-emerald-400 transition-colors line-clamp-2">
-                        {item.title}
-                      </h4>
-                      {item.description && (
-                        <p class="text-xs text-muted-foreground line-clamp-2 mt-1">
-                          {item.description}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </a>
+                <RelatedContentCard item={item} index={index} />
               ))}
             </div>
           </div>

@@ -2,6 +2,7 @@
 import MobileNav from '@/components/react/MobileNav';
 import SearchBar from '@/components/react/SearchBar';
 import Contact from '@/components/react/Contact';
+import { NAV_ITEMS } from '@/lib/nav';
 
 const pathname = Astro.url.pathname;
 
@@ -9,12 +10,6 @@ const isActive = (path: string) => {
   if (path === '/') return pathname === '/';
   return pathname.startsWith(path);
 };
-
-const navItems = [
-  { name: 'Projects', path: '/projects' },
-  { name: 'Blog', path: '/blog' },
-  { name: 'Shares', path: '/shares' },
-];
 ---
 
 <nav class="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-emerald-500/20">
@@ -32,7 +27,7 @@ const navItems = [
       </a>
 
       <div class="hidden md:flex items-center gap-1 ml-3">
-        {navItems.map((item) => (
+        {NAV_ITEMS.map((item) => (
           <a
             href={item.path}
             class:list={[
