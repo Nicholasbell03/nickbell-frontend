@@ -24,7 +24,7 @@ function getDefaultTab(pathname: string): SearchType {
 function useIsMac() {
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
-    setIsMac(navigator.platform.includes('Mac'));
+    setIsMac(/Mac/.test(navigator.userAgent));
   }, []);
   return isMac;
 }
@@ -190,7 +190,6 @@ export default function SearchBar({ mobile = false, onNavigate }: SearchBarProps
             onTabChange={setActiveTab}
             getTabCount={getTabCount}
             onNavigate={handleNavigate}
-            isMac={isMac}
           />
         )}
       </div>
@@ -239,7 +238,6 @@ export default function SearchBar({ mobile = false, onNavigate }: SearchBarProps
           onTabChange={setActiveTab}
           getTabCount={getTabCount}
           onNavigate={handleNavigate}
-          isMac={isMac}
         />
       )}
     </div>
@@ -260,7 +258,6 @@ interface ResultsDropdownProps {
   onTabChange: (tab: SearchType) => void;
   getTabCount: (tab: SearchType) => number;
   onNavigate: (path: string) => void;
-  isMac: boolean;
 }
 
 function ResultsDropdown({
@@ -271,8 +268,8 @@ function ResultsDropdown({
   onTabChange,
   getTabCount,
   onNavigate,
-  isMac,
 }: ResultsDropdownProps) {
+  const isMac = useIsMac();
   const visibleCount = getTabCount(activeTab);
 
   return (
