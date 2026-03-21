@@ -1,0 +1,243 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import HeroChat from '@/components/react/HeroChat';
+import GitHubActivity from '@/components/react/GitHubActivity';
+import TechStack from '@/components/react/TechStack';
+import { fetchApi } from '@/lib/api';
+import { formatDistanceToNow } from 'date-fns';
+import { safeHostname, stripHtml } from '@/lib/utils';
+import type { BlogSummary } from '@/types/blog';
+import type { ProjectSummary } from '@/types/project';
+import type { ShareSummary } from '@/types/share';
+import type { Technology } from '@/types/technology';
+import type { GitHubActivity as GitHubActivityType } from '@/types/github';
+
+// Fetch all homepage data in parallel
+const [blogsRes, projectsRes, sharesRes, techRes, githubRes] = await Promise.all([
+  fetchApi<{ data: BlogSummary[] }>('/api/v1/blogs/featured').catch(() => ({ data: [] })),
+  fetchApi<{ data: ProjectSummary[] }>('/api/v1/projects/featured').catch(() => ({ data: [] })),
+  fetchApi<{ data: ShareSummary[] }>('/api/v1/shares/featured').catch(() => ({ data: [] })),
+  fetchApi<{ data: Technology[] }>('/api/v1/technologies').catch(() => ({ data: [] })),
+  fetchApi<{ data: GitHubActivityType }>('/api/v1/github/activity').catch(() => null),
+]);
+
+const blogs = blogsRes.data;
+const projects = projectsRes.data;
+const shares = sharesRes.data;
+const technologies = techRes.data;
+const githubActivity = githubRes?.data ?? null;
+
+// CDN cache: 1 hour fresh, 1 day stale-while-revalidate
+Astro.response.headers.set(
+  'Netlify-CDN-Cache-Control',
+  'public, s-maxage=3600, stale-while-revalidate=86400'
+);
+---
+
+<Layout
+  title="Nicholas Bell | Software Engineer"
+  description="Software engineer building modern web applications. Blog posts, projects, and curated links."
+>
+  <!-- Hero with chat input (React island) -->
+  <HeroChat client:load />
+
+  <!-- GitHub Activity + Tech Stack -->
+  <section class="py-8 md:py-14 px-4">
+    <div class="container mx-auto max-w-7xl">
+      <div class="grid md:grid-cols-3 gap-6">
+        {githubActivity && githubActivity.daily_contributions.length > 0 && (
+          <div>
+            <GitHubActivity client:visible activity={githubActivity} />
+          </div>
+        )}
+        <div class:list={[githubActivity ? 'md:col-span-2' : 'md:col-span-3']}>
+          <TechStack client:visible technologies={technologies} />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Projects -->
+  {projects.length > 0 && (
+    <section id="projects" class="py-8 md:py-14 px-4">
+      <div class="container mx-auto max-w-7xl">
+        <div class="flex items-center justify-between mb-12">
+          <div class="space-y-2">
+            <h2 class="text-3xl md:text-4xl font-bold">Featured Projects</h2>
+            <p class="text-muted-foreground text-lg">
+              A selection of recent work showcasing expertise across full-stack development
+            </p>
+          </div>
+          <a href="/projects" class="hidden sm:inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {projects.map((project, index) => (
+            <a href={`/projects/${project.slug}`}>
+              <div
+                class="group rounded-lg border border-emerald-500/20 bg-card shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer"
+                style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
+              >
+                {project.featured_image && (
+                  <div class="relative h-48 overflow-hidden bg-muted">
+                    <img src={project.featured_image} alt={project.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                  </div>
+                )}
+                <div class="p-6 space-y-2">
+                  <h3 class="text-xl font-semibold group-hover:text-emerald-400 transition-colors">{project.title}</h3>
+                  <p class="text-sm text-muted-foreground">{project.description}</p>
+                  <div class="flex flex-wrap gap-2 pt-2">
+                    {project.technologies.slice(0, 4).map((tech) => (
+                      <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">{tech}</span>
+                    ))}
+                    {project.technologies.length > 4 && (
+                      <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">+{project.technologies.length - 4}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="text-center sm:hidden">
+          <a href="/projects" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All Projects
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Latest Blogs -->
+  {blogs.length > 0 && (
+    <section class="py-8 md:py-14 px-4 bg-background/50">
+      <div class="container mx-auto max-w-7xl">
+        <div class="flex items-center justify-between mb-12">
+          <div class="space-y-2">
+            <h2 class="text-3xl md:text-4xl font-bold">Latest Blogs</h2>
+            <p class="text-muted-foreground text-lg">
+              Insights on web development, AI integration, and software architecture
+            </p>
+          </div>
+          <a href="/blog" class="hidden sm:inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {blogs.map((post, index) => (
+            <a href={`/blog/${post.slug}`}>
+              <div
+                class="group rounded-lg border border-emerald-500/20 bg-card shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer flex flex-col"
+                style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
+              >
+                <div class="relative h-40 overflow-hidden bg-muted">
+                  {post.featured_image ? (
+                    <img src={post.featured_image} alt={post.title} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div class="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
+                      <svg class="h-14 w-14 text-emerald-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                    </div>
+                  )}
+                  <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                  <div class="flex items-center gap-4 text-sm text-muted-foreground mb-2">
+                    <span>{formatDistanceToNow(new Date(post.published_at), { addSuffix: true })}</span>
+                    <span>{post.read_time} min</span>
+                  </div>
+                  <h3 class="text-xl font-semibold group-hover:text-emerald-400 transition-colors">{post.title}</h3>
+                  <p class="text-sm text-muted-foreground line-clamp-3 mt-1">{post.excerpt}</p>
+                  <div class="mt-auto pt-4 text-sm text-emerald-400 group-hover:text-emerald-300 flex items-center gap-2">
+                    Read More
+                    <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="text-center sm:hidden">
+          <a href="/blog" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All Posts
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Latest Shares -->
+  {shares.length > 0 && (
+    <section class="py-8 md:py-14 px-4">
+      <div class="container mx-auto max-w-7xl">
+        <div class="flex items-center justify-between mb-12">
+          <div class="space-y-2">
+            <h2 class="text-3xl md:text-4xl font-bold">Latest Shares</h2>
+            <p class="text-muted-foreground text-lg">
+              Interesting finds from around the web
+            </p>
+          </div>
+          <a href="/shares" class="hidden sm:inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {shares.map((share, index) => (
+            <a href={`/shares/${share.slug}`}>
+              <div
+                class="group rounded-lg border border-emerald-500/20 bg-card shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer flex flex-col"
+                style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
+              >
+                <div class="relative h-40 overflow-hidden bg-muted">
+                  {share.image_url ? (
+                    <img src={share.image_url} alt={share.title ?? ''} loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                  ) : (
+                    <div class="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">
+                      <svg class="h-14 w-14 text-emerald-800" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+                    </div>
+                  )}
+                  <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
+                </div>
+                <div class="p-6 flex-1 flex flex-col">
+                  <div class="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                    <span class="capitalize">{share.source_type.replace('_', ' ')}</span>
+                    {share.author && <span>· {share.author}</span>}
+                    <span class="ml-auto">{formatDistanceToNow(new Date(share.created_at), { addSuffix: true })}</span>
+                  </div>
+                  <h3 class="text-lg font-semibold group-hover:text-emerald-400 transition-colors">{share.title ?? safeHostname(share.url)}</h3>
+                  {(share.summary || share.commentary) && (
+                    <p class:list={['text-sm text-muted-foreground mt-1', !share.summary && 'line-clamp-2']}>
+                      {share.summary ?? stripHtml(share.commentary ?? '')}
+                    </p>
+                  )}
+                  <div class="mt-auto pt-4 text-sm text-emerald-400 group-hover:text-emerald-300 flex items-center gap-2">
+                    View Share
+                    <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </div>
+                </div>
+              </div>
+            </a>
+          ))}
+        </div>
+
+        <div class="text-center sm:hidden">
+          <a href="/shares" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
+            View All Shares
+            <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
+</Layout>
