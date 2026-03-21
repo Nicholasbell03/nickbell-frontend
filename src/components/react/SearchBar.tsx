@@ -42,6 +42,7 @@ function useSearch(query: string) {
   useEffect(() => {
     if (query.length < 2) {
       setResults(undefined);
+      setIsLoading(false);
       return;
     }
     const controller = new AbortController();
