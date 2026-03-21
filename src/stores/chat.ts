@@ -3,8 +3,8 @@ import { atom } from 'nanostores';
 /** Whether the chat panel slide-out is open. */
 export const $isPanelOpen = atom(false);
 
-/** Whether the hero chat input is visible in the viewport. */
-export const $heroInputVisible = atom(false);
+/** Whether the hero chat input is visible in the viewport (default true — matches SSR page-load state). */
+export const $heroInputVisible = atom(true);
 
 /** Whether an existing conversation has messages. */
 export const $hasExistingConversation = atom(false);
