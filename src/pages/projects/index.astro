@@ -42,45 +42,45 @@ setCdnCache(Astro.response, meta, { sMaxAge: 3600, swr: 86400 });
         </div>
       )}
 
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="space-y-6">
         {projects.map((project, index) => (
           <a href={`/projects/${project.slug}`} class="block">
             <div
-              class="group rounded-lg border border-emerald-500/20 bg-card text-card-foreground shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 overflow-hidden h-full cursor-pointer flex flex-col"
+              class="group rounded-lg border border-emerald-500/20 bg-card text-card-foreground shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 cursor-pointer"
               style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
             >
-              <div class="relative h-48 overflow-hidden bg-muted">
-                {project.featured_image ? (
-                  <img
-                    src={project.featured_image}
-                    alt={project.title}
-                    loading="lazy"
-                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div class="w-full h-full bg-slate-800/50 flex flex-col items-center justify-center gap-3">
-                    <!-- Briefcase icon -->
-                    <svg class="h-10 w-10 text-emerald-500/40" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
-                    <span class="text-xs text-muted-foreground/50 uppercase tracking-widest">Project</span>
+              <div class="flex flex-col md:flex-row">
+                <div class="md:w-64 lg:w-80 shrink-0">
+                  {project.featured_image ? (
+                    <img
+                      src={project.featured_image}
+                      alt={project.title}
+                      loading="lazy"
+                      class="w-full h-48 object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+                    />
+                  ) : (
+                    <div class="w-full h-48 min-h-[160px] bg-slate-800/50 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex flex-col items-center justify-center gap-3 border-r border-emerald-500/10">
+                      <svg class="h-10 w-10 text-emerald-500/40" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+                      <span class="text-xs text-muted-foreground/50 uppercase tracking-widest">Project</span>
+                    </div>
+                  )}
+                </div>
+                <div class="flex flex-col flex-1 p-6">
+                  <h2 class="text-xl font-semibold leading-none tracking-tight group-hover:text-emerald-400 transition-colors mb-2">
+                    {project.title}
+                  </h2>
+                  {project.description && (
+                    <p class="text-sm text-muted-foreground line-clamp-2 mb-4">
+                      {project.description}
+                    </p>
+                  )}
+                  <div class="mt-auto flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 text-xs font-semibold">
+                        {tech}
+                      </span>
+                    ))}
                   </div>
-                )}
-                <div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent" />
-              </div>
-              <div class="p-6 flex flex-col flex-1">
-                <h2 class="text-xl font-semibold leading-none tracking-tight group-hover:text-emerald-400 transition-colors mb-2">
-                  {project.title}
-                </h2>
-                {project.description && (
-                  <p class="text-sm text-muted-foreground line-clamp-2 mb-4">
-                    {project.description}
-                  </p>
-                )}
-                <div class="mt-auto flex flex-wrap gap-2">
-                  {project.technologies.map((tech) => (
-                    <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 text-xs font-semibold">
-                      {tech}
-                    </span>
-                  ))}
                 </div>
               </div>
             </div>
