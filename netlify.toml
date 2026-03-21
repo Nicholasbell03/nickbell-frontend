@@ -1,5 +1,4 @@
 [build]
-  publish = "dist"
   command = "yarn build"
 
 # Redirect admin to Laravel backend
@@ -9,32 +8,9 @@
   status = 301
   force = true
 
-# Edge function for OG meta tags (crawler detection)
-[[edge_functions]]
-  function = "og-meta"
-  path = "/"
-
-[[edge_functions]]
-  function = "og-meta"
-  path = "/blog/*"
-
-[[edge_functions]]
-  function = "og-meta"
-  path = "/projects/*"
-
-[[edge_functions]]
-  function = "og-meta"
-  path = "/shares/*"
-
 # RSS feed proxy to backend
 [[redirects]]
   from = "/feed"
   to = "https://api.nickbell.dev/feed"
   status = 200
   force = true
-
-# SPA fallback (must be last)
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200

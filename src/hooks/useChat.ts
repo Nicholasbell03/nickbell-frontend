@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { chatApi } from "@/services/api";
+import { chatApi } from "@/lib/client-api";
 import type { ChatMessage, ContentReference } from "@/types/chat";
 
 const CONVERSATION_ID_KEY = "chat_conversation_id";
@@ -217,12 +217,18 @@ function deduplicateReferences(refs: ContentReference[]): ContentReference[] {
 }
 
 export function useChat() {
-	const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
+	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [hasFirstToken, setHasFirstToken] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const prevStreamingRef = useRef(false);
+
+	// Hydrate messages from localStorage after mount to avoid SSR mismatch
+	useEffect(() => {
+		const stored = loadMessages();
+		if (stored.length > 0) setMessages(stored);
+	}, []);
 
 	// Persist messages when streaming finishes (true → false transition)
 	useEffect(() => {
@@ -269,9 +275,10 @@ export function useChat() {
 
 		const abortController = new AbortController();
 		abortControllerRef.current = abortController;
+		let timedOut = false;
 
 		const timeoutId = setTimeout(() => {
-			abortControllerRef.current = null;
+			timedOut = true;
 			abortController.abort();
 		}, 30000);
 
@@ -286,12 +293,14 @@ export function useChat() {
 				setError(
 					"You're sending messages too quickly. Please wait a moment and try again.",
 				);
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
 
 			if (!response.ok) {
 				setError("Something went wrong. Please try again.");
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
@@ -311,6 +320,7 @@ export function useChat() {
 			const reader = response.body?.getReader();
 			if (!reader) {
 				setError("Failed to read response stream.");
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
@@ -406,8 +416,7 @@ export function useChat() {
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") {
-				if (!abortControllerRef.current) {
-					// Timeout — controller was cleared
+				if (timedOut) {
 					setError(
 						"The request timed out. Please try again.",
 					);

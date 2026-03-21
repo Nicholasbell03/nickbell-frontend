@@ -28,6 +28,11 @@ dist-ssr
 .env
 .env.*
 
+# Astro
+.astro/
+.netlify/
+
 # yarn
 .yarn
 .pnp.*
+.gstack/

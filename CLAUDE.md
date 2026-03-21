@@ -5,8 +5,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
-yarn dev        # Start development server (Vite with HMR)
-yarn build      # Type-check with tsc and build for production
+yarn dev        # Start Astro dev server with HMR
+yarn build      # Type-check with astro check and build for production
 yarn lint       # Run ESLint
 yarn preview    # Preview production build locally
 ```
@@ -17,18 +17,20 @@ This project uses Yarn 4 (Berry) with Plug'n'Play (see .pnp.cjs).
 
 ## Architecture
 
-This is a personal portfolio website built with React 19, TypeScript, and Vite.
+This is a personal portfolio website built with Astro 6, TypeScript, and React 19 (islands only).
 
-**Routing:** React Router v7 with lazy-loaded routes. Entry point is `src/main.tsx` which wraps the app in `BrowserRouter`. Routes are defined in `src/routes.tsx` using `Suspense` for code splitting.
+**Rendering:** Full SSR via `output: 'server'` with the Netlify adapter. Pages are `.astro` files in `src/pages/` using file-based routing. The shared layout is `src/layouts/Layout.astro`.
 
-**Styling:** Tailwind CSS v4 via PostCSS (`@tailwindcss/postcss`). Global styles and custom animations (float, pulse) are in `src/index.css`. Uses the new v4 `@import 'tailwindcss'` syntax.
+**Islands architecture:** Most pages ship zero client JavaScript. Interactive components are React "islands" in `src/components/react/` that hydrate independently using Astro's `client:load` / `client:idle` directives. Cross-island state uses Nano Stores (`nanostores/react`).
+
+**Styling:** Tailwind CSS v4 via the `@tailwindcss/vite` plugin (configured in `astro.config.mjs`). Global styles and custom animations are in `src/index.css`.
 
 **UI Libraries:**
 - `@headlessui/react` - Accessible UI primitives
-- `@heroicons/react` - Icon set
-- `react-icons` - Additional icons (currently using Font Awesome icons)
+- `lucide-react` - Icon set
+- `react-icons` - Additional icons (Font Awesome)
 
-**Component Structure:** Components live in `src/components/`. The main `App.tsx` composes the page layout from component modules.
+**Component Structure:** Astro components live in `src/components/`. React islands live in `src/components/react/`. Pages are in `src/pages/` with nested directories for `blog/`, `projects/`, and `shares/`.
 
 ## Learning Mode
 

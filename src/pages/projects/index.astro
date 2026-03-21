@@ -1,0 +1,100 @@
+---
+import Layout from '@/layouts/Layout.astro';
+import Pagination from '@/components/Pagination.astro';
+import { fetchApi } from '@/lib/api';
+import { setCdnCache } from '@/lib/cache';
+import type { ProjectSummary } from '@/types/project';
+import type { PaginatedResponse } from '@/types/blog';
+
+const page = Number(Astro.url.searchParams.get('page')) || 1;
+
+let projects: ProjectSummary[] = [];
+let meta: PaginatedResponse<ProjectSummary>['meta'] | null = null;
+
+try {
+  const res = await fetchApi<PaginatedResponse<ProjectSummary>>(`/api/v1/projects?page=${page}`);
+  projects = res.data;
+  meta = res.meta;
+} catch (err) {
+  // Will render error state below
+}
+
+// CDN cache: 1 hour fresh, 1 day stale-while-revalidate (skipped on API failure)
+setCdnCache(Astro.response, meta, { sMaxAge: 3600, swr: 86400 });
+---
+
+<Layout
+  title="Projects | Nicholas Bell"
+  description="A comprehensive collection of my work across full-stack development, AI integration, and cloud architecture"
+>
+  <div class="py-16 md:py-24 px-4">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center space-y-4 mb-12">
+        <h1 class="text-4xl md:text-5xl font-bold">All Projects</h1>
+        <p class="text-muted-foreground text-lg max-w-2xl mx-auto">
+          A comprehensive collection of my work across full-stack development, AI integration, and cloud architecture
+        </p>
+      </div>
+
+      {projects.length === 0 && (
+        <div class="text-center space-y-4">
+          <p class="text-muted-foreground">No projects found.</p>
+        </div>
+      )}
+
+      <div class="space-y-6">
+        {projects.map((project, index) => (
+          <a href={`/projects/${project.slug}`} class="block">
+            <div
+              class="group rounded-lg border border-emerald-500/20 bg-card text-card-foreground shadow-sm hover:shadow-xl hover:shadow-emerald-500/10 transition-all duration-300 cursor-pointer"
+              style={`animation: fadeIn 0.5s ease-out ${index * 0.1}s both`}
+            >
+              <div class="flex flex-col md:flex-row">
+                <div class="md:w-64 lg:w-80 shrink-0">
+                  {project.featured_image ? (
+                    <img
+                      src={project.featured_image}
+                      alt={project.title}
+                      loading="lazy"
+                      class="w-full h-48 object-cover rounded-t-lg md:rounded-l-lg md:rounded-tr-none"
+                    />
+                  ) : (
+                    <div class="w-full h-48 min-h-[160px] bg-slate-800/50 rounded-t-lg md:rounded-l-lg md:rounded-tr-none flex flex-col items-center justify-center gap-3 border-r border-emerald-500/10">
+                      <svg class="h-10 w-10 text-emerald-500/40" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></svg>
+                      <span class="text-xs text-muted-foreground/50 uppercase tracking-widest">Project</span>
+                    </div>
+                  )}
+                </div>
+                <div class="flex flex-col flex-1 p-6">
+                  <h2 class="text-xl font-semibold leading-none tracking-tight group-hover:text-emerald-400 transition-colors mb-2">
+                    {project.title}
+                  </h2>
+                  {project.description && (
+                    <p class="text-sm text-muted-foreground line-clamp-2 mb-4">
+                      {project.description}
+                    </p>
+                  )}
+                  <div class="mt-auto flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <span class="inline-flex items-center rounded-full border border-emerald-500/20 bg-emerald-500/10 text-emerald-400 px-2.5 py-0.5 text-xs font-semibold">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+
+      {meta && (
+        <Pagination
+          currentPage={meta.current_page}
+          lastPage={meta.last_page}
+          basePath="/projects"
+        />
+      )}
+    </div>
+  </div>
+</Layout>
