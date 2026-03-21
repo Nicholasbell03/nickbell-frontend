@@ -2,6 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import Pagination from '@/components/Pagination.astro';
 import { fetchApi } from '@/lib/api';
+import { setCdnCache } from '@/lib/cache';
 import { formatDistanceToNow } from 'date-fns';
 import { safeHostname, stripHtml } from '@/lib/utils';
 import type { ShareSummary, SourceType } from '@/types/share';
@@ -20,11 +21,8 @@ try {
   // Will render error state below
 }
 
-// CDN cache: 1 hour fresh, 1 day stale-while-revalidate
-Astro.response.headers.set(
-  'Netlify-CDN-Cache-Control',
-  'public, s-maxage=3600, stale-while-revalidate=86400'
-);
+// CDN cache: 1 hour fresh, 1 day stale-while-revalidate (skipped on API failure)
+setCdnCache(Astro.response, meta, { sMaxAge: 3600, swr: 86400 });
 
 const SOURCE_BADGE: Record<SourceType, { label: string }> = {
   webpage: { label: 'Web' },

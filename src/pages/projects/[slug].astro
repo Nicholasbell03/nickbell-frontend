@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { fetchApi } from '@/lib/api';
+import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { getItemPath } from '@/lib/contentType';
 import type { Project } from '@/types/project';
@@ -33,13 +34,8 @@ const sanitizedLongDescription = project.long_description
   ? sanitizeCmsHtml(project.long_description)
   : '';
 
-// CDN cache: 7 days fresh, 30 days stale-while-revalidate (skip for previews)
-if (!token) {
-  Astro.response.headers.set(
-    'Netlify-CDN-Cache-Control',
-    'public, s-maxage=604800, stale-while-revalidate=2592000'
-  );
-}
+// CDN cache: 7 days fresh, 30 days stale-while-revalidate (skipped for previews)
+setCdnCache(Astro.response, token ? null : project, { sMaxAge: 604800, swr: 2592000 });
 ---
 
 <Layout

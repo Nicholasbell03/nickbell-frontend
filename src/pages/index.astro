@@ -4,6 +4,7 @@ import HeroChat from '@/components/react/HeroChat';
 import GitHubActivity from '@/components/react/GitHubActivity';
 import TechStack from '@/components/react/TechStack';
 import { fetchApi } from '@/lib/api';
+import { setCdnCache } from '@/lib/cache';
 import { formatDistanceToNow } from 'date-fns';
 import { safeHostname, stripHtml } from '@/lib/utils';
 import type { BlogSummary } from '@/types/blog';
@@ -28,10 +29,7 @@ const technologies = techRes.data;
 const githubActivity = githubRes?.data ?? null;
 
 // CDN cache: 1 hour fresh, 1 day stale-while-revalidate
-Astro.response.headers.set(
-  'Netlify-CDN-Cache-Control',
-  'public, s-maxage=3600, stale-while-revalidate=86400'
-);
+setCdnCache(Astro.response, blogs, { sMaxAge: 3600, swr: 86400 });
 ---
 
 <Layout

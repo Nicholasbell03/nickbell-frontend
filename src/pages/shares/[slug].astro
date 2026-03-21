@@ -1,6 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import { fetchApi } from '@/lib/api';
+import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { getItemPath } from '@/lib/contentType';
 import { safeHostname } from '@/lib/utils';
@@ -29,10 +30,7 @@ if (!share) return Astro.redirect('/shares');
 const sanitizedCommentary = share.commentary ? sanitizeCmsHtml(share.commentary) : '';
 
 // CDN cache: 1 day fresh, 7 days stale-while-revalidate
-Astro.response.headers.set(
-  'Netlify-CDN-Cache-Control',
-  'public, s-maxage=86400, stale-while-revalidate=604800'
-);
+setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
 ---
 
 <Layout
