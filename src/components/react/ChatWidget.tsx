@@ -9,7 +9,7 @@ export function ChatWidget() {
   return (
     <button
       onClick={openPanel}
-      className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-opacity duration-300 ${
+      className={`fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-6 z-40 flex items-center justify-center h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40 transition-opacity duration-300 cursor-pointer ${
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       aria-label="Open chat"

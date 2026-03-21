@@ -16,13 +16,13 @@ export default function Contact() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white ml-2 lg:text-[15px]">
+        <Button className="bg-emerald-500 hover:bg-emerald-600 text-white ml-2 lg:text-[15px] cursor-pointer">
           Contact Me
           <ChevronDown className="ml-2 h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="text-base py-2">
           <a
             href={CONTACT_INFO.linkedin}
             target="_blank"
@@ -33,7 +33,7 @@ export default function Contact() {
             <span>LinkedIn</span>
           </a>
         </DropdownMenuItem>
-        <DropdownMenuItem asChild>
+        <DropdownMenuItem asChild className="text-base py-2">
           <a
             href={`mailto:${CONTACT_INFO.email}`}
             className="flex items-center gap-2 cursor-pointer"
