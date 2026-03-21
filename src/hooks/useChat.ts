@@ -217,12 +217,18 @@ function deduplicateReferences(refs: ContentReference[]): ContentReference[] {
 }
 
 export function useChat() {
-	const [messages, setMessages] = useState<ChatMessage[]>(loadMessages);
+	const [messages, setMessages] = useState<ChatMessage[]>([]);
 	const [isStreaming, setIsStreaming] = useState(false);
 	const [hasFirstToken, setHasFirstToken] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const prevStreamingRef = useRef(false);
+
+	// Hydrate messages from localStorage after mount to avoid SSR mismatch
+	useEffect(() => {
+		const stored = loadMessages();
+		if (stored.length > 0) setMessages(stored);
+	}, []);
 
 	// Persist messages when streaming finishes (true → false transition)
 	useEffect(() => {

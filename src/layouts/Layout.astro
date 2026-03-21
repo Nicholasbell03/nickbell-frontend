@@ -16,7 +16,7 @@ interface Props {
 }
 
 const { title, description, image, url, type, publishedTime } = Astro.props;
-const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN ?? '';
 ---
 
 <!doctype html>
