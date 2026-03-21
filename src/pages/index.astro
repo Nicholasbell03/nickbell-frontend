@@ -209,7 +209,7 @@ setCdnCache(Astro.response, blogs, { sMaxAge: 3600, swr: 86400 });
                 </div>
                 <div class="p-6 flex-1 flex flex-col">
                   <div class="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                    <span class="capitalize">{share.source_type.replace('_', ' ')}</span>
+                    <span class="capitalize">{share.source_type.replaceAll('_', ' ')}</span>
                     {share.author && <span>· {share.author}</span>}
                     <span class="ml-auto">{formatDistanceToNow(new Date(share.created_at), { addSuffix: true })}</span>
                   </div>

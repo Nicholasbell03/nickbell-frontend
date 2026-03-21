@@ -372,7 +372,7 @@ function ResultsDropdown({
                     icon={<Share2 className="h-4 w-4" />}
                     title={share.title ?? 'Untitled'}
                     subtitle={truncate(share.description ?? share.commentary)}
-                    badge={share.source_type.replace('_', ' ')}
+                    badge={share.source_type.replaceAll('_', ' ')}
                     onClick={() => onNavigate(`/shares/${share.slug}`)}
                   />
                 ))}

@@ -287,12 +287,14 @@ export function useChat() {
 				setError(
 					"You're sending messages too quickly. Please wait a moment and try again.",
 				);
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
 
 			if (!response.ok) {
 				setError("Something went wrong. Please try again.");
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
@@ -312,6 +314,7 @@ export function useChat() {
 			const reader = response.body?.getReader();
 			if (!reader) {
 				setError("Failed to read response stream.");
+				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}

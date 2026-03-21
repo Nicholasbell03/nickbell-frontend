@@ -13,8 +13,6 @@ export function ContentReferenceCard({ reference }: { reference: ContentReferenc
 	return (
 		<a
 			href={reference.href}
-			target="_blank"
-			rel="noopener noreferrer"
 			className="group flex items-center gap-3 rounded-xl border border-emerald-500/20 bg-slate-800/60 px-3 py-2 backdrop-blur-sm transition-all duration-200 hover:border-emerald-500/40 hover:shadow-lg hover:shadow-emerald-500/10"
 		>
 			<div className="h-9 w-9 flex-shrink-0 overflow-hidden rounded-lg bg-slate-700/50">
