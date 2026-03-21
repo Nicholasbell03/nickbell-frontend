@@ -9760,6 +9760,9 @@ __metadata:
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.46.4"
     vite: "npm:^8.0.1"
+  dependenciesMeta:
+    "@netlify/edge-functions-dev@1.0.16":
+      unplugged: true
   languageName: unknown
   linkType: soft
 
