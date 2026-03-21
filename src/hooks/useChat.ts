@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { chatApi } from "@/services/api";
+import { chatApi } from "@/lib/client-api";
 import type { ChatMessage, ContentReference } from "@/types/chat";
 
 const CONVERSATION_ID_KEY = "chat_conversation_id";
@@ -269,9 +269,10 @@ export function useChat() {
 
 		const abortController = new AbortController();
 		abortControllerRef.current = abortController;
+		let timedOut = false;
 
 		const timeoutId = setTimeout(() => {
-			abortControllerRef.current = null;
+			timedOut = true;
 			abortController.abort();
 		}, 30000);
 
@@ -406,8 +407,7 @@ export function useChat() {
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") {
-				if (!abortControllerRef.current) {
-					// Timeout — controller was cleared
+				if (timedOut) {
 					setError(
 						"The request timed out. Please try again.",
 					);
