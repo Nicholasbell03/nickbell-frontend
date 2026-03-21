@@ -1,0 +1,61 @@
+---
+import MobileNav from '@/components/react/MobileNav';
+import SearchBar from '@/components/react/SearchBar';
+import Contact from '@/components/react/Contact';
+
+const pathname = Astro.url.pathname;
+
+const isActive = (path: string) => {
+  if (path === '/') return pathname === '/';
+  return pathname.startsWith(path);
+};
+
+const navItems = [
+  { name: 'Projects', path: '/projects' },
+  { name: 'Blog', path: '/blog' },
+  { name: 'Shares', path: '/shares' },
+];
+---
+
+<nav class="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b border-emerald-500/20">
+  <div class="container mx-auto max-w-7xl px-4">
+    <div class="flex items-center h-16 lg:h-[4.5rem] gap-1">
+      <a
+        href="/"
+        class:list={[
+          'flex items-center gap-2 group shrink-0 rounded-md px-3 py-1.5 transition-colors',
+          isActive('/') ? 'bg-emerald-500/10' : 'hover:bg-emerald-500/5',
+        ]}
+      >
+        <svg class="h-6 w-6 text-emerald-400 group-hover:rotate-180 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m18 16 4-4-4-4"/><path d="m6 8-4 4 4 4"/><path d="m14.5 4-5 16"/></svg>
+        <span class="font-bold text-lg">Nick</span>
+      </a>
+
+      <div class="hidden md:flex items-center gap-1 ml-3">
+        {navItems.map((item) => (
+          <a
+            href={item.path}
+            class:list={[
+              'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 h-10 px-4 py-2 lg:text-[15px]',
+              isActive(item.path)
+                ? 'text-emerald-400 bg-emerald-500/10'
+                : 'hover:text-emerald-400 hover:bg-emerald-500/5',
+            ]}
+          >
+            {item.name}
+          </a>
+        ))}
+      </div>
+
+      <div class="hidden md:flex flex-1" />
+
+      <div class="hidden md:flex items-center gap-4 md:gap-6 shrink-0">
+        <SearchBar client:idle />
+        <Contact client:load />
+      </div>
+
+      <div class="flex-1 md:hidden" />
+      <MobileNav client:media="(max-width: 768px)" pathname={pathname} />
+    </div>
+  </div>
+</nav>

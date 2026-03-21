@@ -1,0 +1,56 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import Head from '@/components/Head.astro';
+import Navigation from '@/components/Navigation.astro';
+import Footer from '@/components/Footer.astro';
+import ChatIsland from '@/components/react/ChatIsland';
+import '@/styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+  url?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+}
+
+const { title, description, image, url, type, publishedTime } = Astro.props;
+const cfToken = import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <Head
+      title={title}
+      description={description}
+      image={image}
+      url={url}
+      type={type}
+      publishedTime={publishedTime}
+    />
+    <ClientRouter />
+  </head>
+  <body>
+    <div class="min-h-screen bg-background text-foreground flex flex-col">
+      <Navigation />
+      <main class="flex-1" transition:animate="fade">
+        <slot />
+      </main>
+      <Footer />
+      <ChatIsland client:load transition:persist="chat" />
+    </div>
+
+    {cfToken && (
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={`{"token": "${cfToken}"}`}
+      />
+    )}
+  </body>
+</html>
