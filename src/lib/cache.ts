@@ -7,6 +7,6 @@ export function setCdnCache(
   if (data == null) return;
   response.headers.set(
     'Netlify-CDN-Cache-Control',
-    `public, s-maxage=${sMaxAge}, stale-while-revalidate=${swr}`,
+    `durable, public, s-maxage=${sMaxAge}, stale-while-revalidate=${swr}`,
   );
 }
