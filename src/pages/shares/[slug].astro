@@ -92,12 +92,11 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
             <blockquote class="twitter-tweet" data-theme="dark">
               <a href={`https://twitter.com/i/status/${share.embed_data.tweet_id}`}>Loading tweet...</a>
             </blockquote>
-            <script is:inline async src="https://platform.twitter.com/widgets.js"></script>
           </div>
         )}
 
-        {/* Image for non-YouTube sources */}
-        {share.source_type !== 'youtube' && share.image_url && (
+        {/* Image preview (suppressed when an embed is shown instead) */}
+        {share.source_type !== 'youtube' && share.source_type !== 'x_post' && share.image_url && (
           <a
             href={share.url}
             target="_blank"
@@ -176,4 +175,15 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
       </article>
     </div>
   </div>
+  <script is:inline>
+    if (
+      document.querySelector('.twitter-tweet') &&
+      !document.querySelector('script[src="https://platform.twitter.com/widgets.js"]')
+    ) {
+      const s = document.createElement('script');
+      s.src = 'https://platform.twitter.com/widgets.js';
+      s.async = true;
+      document.head.appendChild(s);
+    }
+  </script>
 </Layout>
