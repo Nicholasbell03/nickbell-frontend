@@ -176,7 +176,10 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
     </div>
   </div>
   <script is:inline>
-    if (document.querySelector('.twitter-tweet')) {
+    if (
+      document.querySelector('.twitter-tweet') &&
+      !document.querySelector('script[src="https://platform.twitter.com/widgets.js"]')
+    ) {
       const s = document.createElement('script');
       s.src = 'https://platform.twitter.com/widgets.js';
       s.async = true;
