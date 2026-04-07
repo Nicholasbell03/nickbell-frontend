@@ -113,3 +113,18 @@ body {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
 }
+
+/*
+ * react-tweet overrides
+ * The package hardcodes max-width: 550px on .react-tweet-theme via a CSS
+ * module rule with equal specificity. We use a parent wrapper class so the
+ * descendant selector wins on specificity (0,2,0 vs 0,1,0) regardless of
+ * stylesheet load order — Vite's dev pipeline can otherwise inject the
+ * module CSS after global.css on first paint, causing a flash of the
+ * default narrow layout until refresh.
+ */
+.x-tweet-wrapper .react-tweet-theme {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+}

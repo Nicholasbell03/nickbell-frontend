@@ -1,0 +1,84 @@
+---
+import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
+import type { Share } from '@/types/share';
+
+interface Props {
+  share: Share;
+}
+
+const { share } = Astro.props;
+
+// Best-effort parse of "Name (@handle) on X" — the OG title format X typically
+// supplies. Falls back gracefully when the shape differs.
+function parseAuthor(title: string | null): { name: string | null; handle: string | null } {
+  if (!title) return { name: null, handle: null };
+  const match = title.match(/^(.*?)\s*\(@([\w]+)\)/);
+  if (match) {
+    return { name: match[1].trim() || null, handle: `@${match[2]}` };
+  }
+  const handleOnly = title.match(/@([\w]+)/);
+  if (handleOnly) {
+    return { name: null, handle: `@${handleOnly[1]}` };
+  }
+  return { name: title, handle: null };
+}
+
+const { name, handle } = parseAuthor(share.title ?? null);
+
+// X's og:description (which the backend stores as `description`) is capped
+// around ~200 chars. If we're at or near the cap, the tweet is almost
+// certainly truncated — append an ellipsis so the "Read full post on X" CTA
+// reads as a continuation. Heuristic, not exact: false-positive rate is low
+// because complete tweets rarely land in this range.
+const description = share.description ?? '';
+const isLikelyTruncated = description.length >= 190;
+const displayDescription = isLikelyTruncated ? `${description.trimEnd()}…` : description;
+---
+
+<article class="rounded-2xl border border-emerald-500/20 bg-card p-5 sm:p-6 space-y-4 transition-colors hover:border-emerald-500/30">
+  {(name || handle) && (
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center gap-3 group w-fit"
+    >
+      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5 border border-foreground/10">
+        <SourceTypeIcon type="x_post" class="h-4 w-4 text-foreground" />
+      </span>
+      <span class="min-w-0 leading-tight">
+        {name && (
+          <span class="block font-semibold text-foreground group-hover:text-emerald-400 transition-colors truncate">
+            {name}
+          </span>
+        )}
+        {handle && (
+          <span class="block text-sm text-muted-foreground truncate">{handle}</span>
+        )}
+      </span>
+    </a>
+  )}
+
+  {displayDescription && (
+    <p class="text-lg leading-relaxed text-foreground whitespace-pre-wrap">
+      {displayDescription}
+    </p>
+  )}
+
+  {share.image_url && (
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="block rounded-xl overflow-hidden border border-emerald-500/10 hover:border-emerald-500/30 transition-colors"
+    >
+      <img
+        src={share.image_url}
+        alt=""
+        loading="lazy"
+        class="w-full max-h-[28rem] object-cover"
+      />
+    </a>
+  )}
+
+</article>
