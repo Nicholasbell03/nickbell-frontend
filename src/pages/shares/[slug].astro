@@ -55,11 +55,15 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
 // Per-source-type CTA copy for the callout link below the embed/card.
 // For webpage shares we surface the hostname so the visitor knows which site
 // they're heading to; for branded sources the icon + label are self-describing.
-const sourceLinkLabel: string =
-  share.source_type === 'x_post' ? 'Read full post on X' :
-  share.source_type === 'youtube' ? 'Watch on YouTube' :
-  share.source_type === 'linkedin' ? 'View post on LinkedIn' :
-  `Visit ${safeHostname(share.url)}`;
+// `satisfies Record<SourceType, ...>` enforces exhaustiveness — if a new
+// SourceType is added to the union, TypeScript will flag this block.
+const sourceLinkLabels = {
+  x_post: 'Read full post on X',
+  youtube: 'Watch on YouTube',
+  linkedin: 'View post on LinkedIn',
+  webpage: `Visit ${safeHostname(share.url)}`,
+} satisfies Record<SourceType, string>;
+const sourceLinkLabel = sourceLinkLabels[share.source_type];
 ---
 
 <Layout
@@ -120,10 +124,8 @@ const sourceLinkLabel: string =
             : <XPostCard share={share} />
         )}
 
-        {/* LinkedIn post card */}
         {share.source_type === 'linkedin' && <LinkedInCard share={share} />}
 
-        {/* Generic webpage rich link card */}
         {share.source_type === 'webpage' && <WebpageCard share={share} />}
 
         {/* Source link callout — single-line CTA, labelled per source type */}

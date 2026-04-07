@@ -1,5 +1,6 @@
 ---
 import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
+import { withTruncationEllipsis } from '@/lib/utils';
 import type { Share } from '@/types/share';
 
 interface Props {
@@ -24,15 +25,7 @@ function parseAuthor(title: string | null): { name: string | null; handle: strin
 }
 
 const { name, handle } = parseAuthor(share.title ?? null);
-
-// X's og:description (which the backend stores as `description`) is capped
-// around ~200 chars. If we're at or near the cap, the tweet is almost
-// certainly truncated — append an ellipsis so the "Read full post on X" CTA
-// reads as a continuation. Heuristic, not exact: false-positive rate is low
-// because complete tweets rarely land in this range.
-const description = share.description ?? '';
-const isLikelyTruncated = description.length >= 190;
-const displayDescription = isLikelyTruncated ? `${description.trimEnd()}…` : description;
+const displayDescription = withTruncationEllipsis(share.description);
 ---
 
 <article class="rounded-2xl border border-emerald-500/20 bg-card p-5 sm:p-6 space-y-4 transition-colors hover:border-emerald-500/30">
