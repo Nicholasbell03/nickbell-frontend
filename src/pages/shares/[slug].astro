@@ -3,6 +3,8 @@ import Layout from '@/layouts/Layout.astro';
 import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
 import RelatedContentCard from '@/components/RelatedContentCard.astro';
 import XPostCard from '@/components/XPostCard.astro';
+import LinkedInCard from '@/components/LinkedInCard.astro';
+import WebpageCard from '@/components/WebpageCard.astro';
 import { EmbeddedTweet } from 'react-tweet';
 import { getTweet } from 'react-tweet/api';
 import { fetchApi } from '@/lib/api';
@@ -118,21 +120,11 @@ const sourceLinkLabel: string =
             : <XPostCard share={share} />
         )}
 
-        {/* Image preview (suppressed when an embed is shown instead) */}
-        {share.source_type !== 'youtube' && share.source_type !== 'x_post' && share.image_url && (
-          <a
-            href={share.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block rounded-lg overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group"
-          >
-            <img
-              src={share.image_url}
-              alt={share.title ?? ''}
-              class="w-full max-h-96 object-cover group-hover:scale-[1.01] transition-transform duration-300"
-            />
-          </a>
-        )}
+        {/* LinkedIn post card */}
+        {share.source_type === 'linkedin' && <LinkedInCard share={share} />}
+
+        {/* Generic webpage rich link card */}
+        {share.source_type === 'webpage' && <WebpageCard share={share} />}
 
         {/* Source link callout — single-line CTA, labelled per source type */}
         <a
@@ -148,11 +140,6 @@ const sourceLinkLabel: string =
           <span class="flex-1 min-w-0 truncate text-emerald-400 font-medium">{sourceLinkLabel}</span>
           <svg class="h-4 w-4 text-emerald-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
         </a>
-
-        {/* Description (suppressed for x_post — rendered inside XPostCard) */}
-        {share.source_type !== 'x_post' && share.description && (
-          <p class="text-xl text-muted-foreground">{share.description}</p>
-        )}
 
         {/* Related content */}
         {relatedData?.related && relatedData.related.length > 0 && (

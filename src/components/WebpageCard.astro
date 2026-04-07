@@ -1,0 +1,50 @@
+---
+import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
+import { safeHostname } from '@/lib/utils';
+import type { Share } from '@/types/share';
+
+interface Props {
+  share: Share;
+}
+
+const { share } = Astro.props;
+
+const hostname = safeHostname(share.url);
+const sourceLabel = share.site_name ?? hostname;
+---
+
+<article class="rounded-2xl border border-emerald-500/20 bg-card overflow-hidden transition-colors hover:border-emerald-500/30">
+  {share.image_url && (
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="block bg-foreground/5"
+    >
+      <img
+        src={share.image_url}
+        alt=""
+        loading="lazy"
+        class="w-full max-h-[24rem] object-contain"
+      />
+    </a>
+  )}
+
+  <div class="p-5 sm:p-6 space-y-3">
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-emerald-400 transition-colors w-fit"
+    >
+      <SourceTypeIcon type="webpage" class="h-3.5 w-3.5" />
+      <span class="truncate">{sourceLabel}</span>
+    </a>
+
+    {share.description && (
+      <p class="text-lg leading-relaxed text-foreground whitespace-pre-wrap">
+        {share.description}
+      </p>
+    )}
+  </div>
+</article>
