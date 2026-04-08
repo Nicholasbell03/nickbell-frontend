@@ -14,6 +14,9 @@ export default defineConfig({
       alias: {
         '@': '/src',
       },
+      // react-tweet ships CSS modules that must be bundled by Vite rather
+      // than externalized for native Node ESM at SSR time.
+      noExternal: ['react-tweet'],
     },
   },
 });

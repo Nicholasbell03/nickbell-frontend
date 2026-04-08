@@ -2,13 +2,18 @@
 import Layout from '@/layouts/Layout.astro';
 import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
 import RelatedContentCard from '@/components/RelatedContentCard.astro';
+import XPostCard from '@/components/XPostCard.astro';
+import LinkedInCard from '@/components/LinkedInCard.astro';
+import WebpageCard from '@/components/WebpageCard.astro';
+import { EmbeddedTweet } from 'react-tweet';
+import { getTweet } from 'react-tweet/api';
 import { fetchApi } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { getItemPath } from '@/lib/contentType';
 import { safeHostname } from '@/lib/utils';
 import { format } from 'date-fns';
-import type { Share } from '@/types/share';
+import type { Share, SourceType } from '@/types/share';
 import type { RelatedContentResponse } from '@/types/related';
 
 const { slug } = Astro.params;
@@ -29,10 +34,36 @@ try {
 
 if (!share) return Astro.redirect('/shares');
 
+// For x_post shares, try to fetch the full tweet from Twitter's syndication
+// CDN at SSR time. If it succeeds we render the rich react-tweet embed; if it
+// fails (deleted tweet, rate limit, endpoint changes), we fall back to the
+// custom XPostCard which only depends on the data already stored on the share.
+let tweet: Awaited<ReturnType<typeof getTweet>> | null = null;
+if (share.source_type === 'x_post' && share.embed_data?.tweet_id) {
+  try {
+    tweet = (await getTweet(share.embed_data.tweet_id)) ?? null;
+  } catch (err) {
+    console.error('react-tweet getTweet failed', err);
+  }
+}
+
 const sanitizedCommentary = share.commentary ? sanitizeCmsHtml(share.commentary) : '';
 
 // CDN cache: 1 day fresh, 7 days stale-while-revalidate
 setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
+
+// Per-source-type CTA copy for the callout link below the embed/card.
+// For webpage shares we surface the hostname so the visitor knows which site
+// they're heading to; for branded sources the icon + label are self-describing.
+// `satisfies Record<SourceType, ...>` enforces exhaustiveness — if a new
+// SourceType is added to the union, TypeScript will flag this block.
+const sourceLinkLabels = {
+  x_post: 'Read full post on X',
+  youtube: 'Watch on YouTube',
+  linkedin: 'View post on LinkedIn',
+  webpage: `Visit ${safeHostname(share.url)}`,
+} satisfies Record<SourceType, string>;
+const sourceLinkLabel = sourceLinkLabels[share.source_type];
 ---
 
 <Layout
@@ -86,49 +117,31 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
           </div>
         )}
 
-        {/* X/Twitter embed */}
-        {share.source_type === 'x_post' && share.embed_data?.tweet_id && (
-          <div class="flex justify-center">
-            <blockquote class="twitter-tweet" data-theme="dark">
-              <a href={`https://twitter.com/i/status/${share.embed_data.tweet_id}`}>Loading tweet...</a>
-            </blockquote>
-          </div>
+        {/* X/Twitter — rich syndication embed with custom-card fallback */}
+        {share.source_type === 'x_post' && (
+          tweet
+            ? <div data-theme="dark" class="x-tweet-wrapper mx-auto w-4/5"><EmbeddedTweet tweet={tweet} /></div>
+            : <XPostCard share={share} />
         )}
 
-        {/* Image preview (suppressed when an embed is shown instead) */}
-        {share.source_type !== 'youtube' && share.source_type !== 'x_post' && share.image_url && (
-          <a
-            href={share.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="block rounded-lg overflow-hidden border border-emerald-500/20 hover:border-emerald-500/40 transition-colors group"
-          >
-            <img
-              src={share.image_url}
-              alt={share.title ?? ''}
-              class="w-full max-h-96 object-cover group-hover:scale-[1.01] transition-transform duration-300"
-            />
-          </a>
-        )}
+        {share.source_type === 'linkedin' && <LinkedInCard share={share} />}
 
-        {/* Source link callout */}
+        {share.source_type === 'webpage' && <WebpageCard share={share} />}
+
+        {/* Source link callout — single-line CTA, labelled per source type */}
         <a
           href={share.url}
           target="_blank"
           rel="noopener noreferrer"
-          class="flex items-center gap-4 p-5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all group"
+          class="flex items-center gap-3 p-4 sm:p-5 rounded-lg border border-emerald-500/20 bg-emerald-500/5 hover:border-emerald-500/40 hover:bg-emerald-500/10 transition-all group"
         >
-          <svg class="h-6 w-6 text-emerald-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
-          <div class="min-w-0">
-            <p class="text-sm text-muted-foreground mb-1">Visit Link</p>
-            <p class="text-emerald-400 font-medium truncate">{share.url}</p>
-          </div>
+          <SourceTypeIcon
+            type={share.source_type}
+            class="h-5 w-5 text-emerald-400 shrink-0"
+          />
+          <span class="flex-1 min-w-0 truncate text-emerald-400 font-medium">{sourceLinkLabel}</span>
+          <svg class="h-4 w-4 text-emerald-400 shrink-0 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
         </a>
-
-        {/* Description */}
-        {share.description && (
-          <p class="text-xl text-muted-foreground">{share.description}</p>
-        )}
 
         {/* Related content */}
         {relatedData?.related && relatedData.related.length > 0 && (
@@ -145,45 +158,23 @@ setCdnCache(Astro.response, share, { sMaxAge: 86400, swr: 604800 });
         )}
 
         {/* Footer navigation */}
-        <div class="border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 justify-between">
+        <div class={`border-t border-emerald-500/20 pt-8 flex flex-wrap gap-4 ${relatedData?.next ? 'justify-between' : 'justify-center'}`}>
           <a href="/shares" class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors">
             <svg class="h-4 w-4 group-hover:-translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
             All Shares
           </a>
-          <div class="flex flex-wrap gap-4">
-            {relatedData?.next && (
-              <a
-                href={getItemPath(relatedData.next)}
-                class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors"
-                title={relatedData.next.title}
-              >
-                Next
-                <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-              </a>
-            )}
+          {relatedData?.next && (
             <a
-              href={share.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white group transition-colors"
+              href={getItemPath(relatedData.next)}
+              class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-input bg-background hover:bg-accent hover:text-accent-foreground group transition-colors"
+              title={relatedData.next.title}
             >
-              Visit Original
-              <svg class="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+              Next
+              <svg class="h-4 w-4 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             </a>
-          </div>
+          )}
         </div>
       </article>
     </div>
   </div>
-  <script is:inline>
-    if (
-      document.querySelector('.twitter-tweet') &&
-      !document.querySelector('script[src="https://platform.twitter.com/widgets.js"]')
-    ) {
-      const s = document.createElement('script');
-      s.src = 'https://platform.twitter.com/widgets.js';
-      s.async = true;
-      document.head.appendChild(s);
-    }
-  </script>
 </Layout>

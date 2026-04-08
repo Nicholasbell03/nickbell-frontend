@@ -1,0 +1,79 @@
+---
+import SourceTypeIcon from '@/components/SourceTypeIcon.astro';
+import { withTruncationEllipsis } from '@/lib/utils';
+import type { Share } from '@/types/share';
+
+interface Props {
+  share: Share;
+}
+
+const { share } = Astro.props;
+
+// Author resolution: prefer the structured `author` field (parsed from the
+// LinkedIn URL path by OpenGraphService when available); otherwise fall back to
+// the first natural-language segment of the OG title (LinkedIn often returns
+// "Person Name on LinkedIn: ..."). Title-case the URL-derived author so it
+// doesn't render as "john smith".
+function titleCase(input: string): string {
+  return input.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function resolveAuthor(): string | null {
+  if (share.author && share.author.trim()) {
+    return titleCase(share.author.trim());
+  }
+  if (share.title) {
+    const match = share.title.match(/^(.*?)\s+on LinkedIn/i);
+    if (match) return match[1].trim();
+  }
+  return null;
+}
+
+const author = resolveAuthor();
+const displayDescription = withTruncationEllipsis(share.description);
+---
+
+<article class="rounded-2xl border border-emerald-500/20 bg-card p-5 sm:p-6 space-y-4 transition-colors hover:border-emerald-500/30">
+  {author && (
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="flex items-center gap-3 group w-fit"
+    >
+      <span class="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/5 border border-foreground/10">
+        <SourceTypeIcon type="linkedin" class="h-4 w-4 text-foreground" />
+      </span>
+      <span class="min-w-0 leading-tight">
+        <span class="block font-semibold text-foreground group-hover:text-emerald-400 transition-colors truncate">
+          {author}
+        </span>
+        <span class="block text-sm text-muted-foreground truncate">
+          {share.site_name ?? 'LinkedIn'}
+        </span>
+      </span>
+    </a>
+  )}
+
+  {share.image_url && (
+    <a
+      href={share.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      class="block rounded-xl overflow-hidden border border-emerald-500/10 hover:border-emerald-500/30 transition-colors bg-foreground/5"
+    >
+      <img
+        src={share.image_url}
+        alt=""
+        loading="lazy"
+        class="w-full max-h-[32rem] object-contain"
+      />
+    </a>
+  )}
+
+  {displayDescription && (
+    <p class="text-lg leading-relaxed text-foreground whitespace-pre-wrap">
+      {displayDescription}
+    </p>
+  )}
+</article>
