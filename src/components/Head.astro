@@ -8,11 +8,16 @@ interface Props {
   publishedTime?: string;
 }
 
+// Never emit preview tokens into canonical/og:url — social unfurl bots and
+// third-party caches would capture the secret from the rendered metadata.
+const defaultUrl = new URL(Astro.url);
+defaultUrl.searchParams.delete('token');
+
 const {
   title,
   description,
   image,
-  url = Astro.url.href,
+  url = defaultUrl.href,
   type = 'website',
   publishedTime,
 } = Astro.props;

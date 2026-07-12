@@ -1,7 +1,7 @@
 ---
 import Layout from '@/layouts/Layout.astro';
 import RelatedContentCard from '@/components/RelatedContentCard.astro';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, isApiStatus } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { getItemPath } from '@/lib/contentType';
@@ -26,11 +26,14 @@ try {
   ]);
   post = blogRes.data;
   relatedData = relatedRes?.data ?? null;
-} catch {
+} catch (err) {
+  // Missing content is a real 404 so stale links drop out of search indexes;
+  // transient API errors degrade gracefully to the listing page instead.
+  if (isApiStatus(err, 404)) return Astro.rewrite('/404');
   return Astro.redirect('/blog');
 }
 
-if (!post) return Astro.redirect('/blog');
+if (!post) return Astro.rewrite('/404');
 
 const sanitizedContent = sanitizeCmsHtml(post.content);
 

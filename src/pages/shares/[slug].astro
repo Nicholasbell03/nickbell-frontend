@@ -7,7 +7,7 @@ import LinkedInCard from '@/components/LinkedInCard.astro';
 import WebpageCard from '@/components/WebpageCard.astro';
 import { EmbeddedTweet } from 'react-tweet';
 import { getTweet } from 'react-tweet/api';
-import { fetchApi } from '@/lib/api';
+import { fetchApi, isApiStatus } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
 import { getItemPath } from '@/lib/contentType';
@@ -28,11 +28,14 @@ try {
   ]);
   share = shareRes.data;
   relatedData = relatedRes?.data ?? null;
-} catch {
+} catch (err) {
+  // Missing content is a real 404 so stale links drop out of search indexes;
+  // transient API errors degrade gracefully to the listing page instead.
+  if (isApiStatus(err, 404)) return Astro.rewrite('/404');
   return Astro.redirect('/shares');
 }
 
-if (!share) return Astro.redirect('/shares');
+if (!share) return Astro.rewrite('/404');
 
 // For x_post shares, try to fetch the full tweet from Twitter's syndication
 // CDN at SSR time. If it succeeds we render the rich react-tweet embed; if it
