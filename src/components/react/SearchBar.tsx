@@ -24,6 +24,9 @@ function getDefaultTab(pathname: string): SearchType {
 function useIsMac() {
   const [isMac, setIsMac] = useState(false);
   useEffect(() => {
+    // Deliberate post-mount setState: the platform can't be known during SSR,
+    // so rendering the non-Mac default first avoids a hydration mismatch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMac(/Mac/.test(navigator.userAgent));
   }, []);
   return isMac;
