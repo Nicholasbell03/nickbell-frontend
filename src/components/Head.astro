@@ -10,17 +10,23 @@ interface Props {
 
 // Never emit preview tokens into canonical/og:url — social unfurl bots and
 // third-party caches would capture the secret from the rendered metadata.
-const defaultUrl = new URL(Astro.url);
-defaultUrl.searchParams.delete('token');
+// Applied to explicitly passed urls too, so no caller can leak one.
+function stripPreviewToken(href: string | URL): string {
+  const clean = new URL(href, Astro.site ?? Astro.url);
+  clean.searchParams.delete('token');
+  return clean.href;
+}
 
 const {
   title,
   description,
   image,
-  url = defaultUrl.href,
+  url = Astro.url.href,
   type = 'website',
   publishedTime,
 } = Astro.props;
+
+const safeUrl = stripPreviewToken(url);
 
 const siteName = 'Nicholas Bell';
 const defaultImage = new URL('/og-default.png', Astro.site).href;
@@ -29,13 +35,13 @@ const ogImage = image || defaultImage;
 
 <title>{title}</title>
 <meta name="description" content={description} />
-<link rel="canonical" href={url} />
+<link rel="canonical" href={safeUrl} />
 <link rel="alternate" type="application/rss+xml" title="Nicholas Bell - RSS Feed" href="/feed" />
 
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={ogImage} />
-<meta property="og:url" content={url} />
+<meta property="og:url" content={safeUrl} />
 <meta property="og:type" content={type} />
 <meta property="og:site_name" content={siteName} />
 {publishedTime && <meta property="article:published_time" content={publishedTime} />}
