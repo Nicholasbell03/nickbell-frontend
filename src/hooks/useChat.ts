@@ -223,6 +223,7 @@ export function useChat() {
 	const [error, setError] = useState<string | null>(null);
 	const abortControllerRef = useRef<AbortController | null>(null);
 	const prevStreamingRef = useRef(false);
+	const streamingRef = useRef(false);
 
 	// Hydrate messages from localStorage after mount to avoid SSR mismatch
 	useEffect(() => {
@@ -263,6 +264,11 @@ export function useChat() {
 	};
 
 	const sendMessage = useCallback(async (text: string) => {
+		// Guard against concurrent sends (e.g. HeroChat submitting while the
+		// panel is already streaming) — two streams would interleave tokens.
+		if (streamingRef.current) return;
+		streamingRef.current = true;
+
 		const userMessage: ChatMessage = { id: crypto.randomUUID(), role: "user", content: text };
 		setMessages((prev) => {
 			const updated = [...prev, userMessage];
@@ -277,6 +283,8 @@ export function useChat() {
 		abortControllerRef.current = abortController;
 		let timedOut = false;
 
+		// Connection timeout only — cleared once headers arrive so long
+		// streaming responses aren't aborted mid-answer.
 		const timeoutId = setTimeout(() => {
 			timedOut = true;
 			abortController.abort();
@@ -289,18 +297,18 @@ export function useChat() {
 				abortController.signal,
 			);
 
+			clearTimeout(timeoutId);
+
 			if (response.status === 429) {
 				setError(
 					"You're sending messages too quickly. Please wait a moment and try again.",
 				);
-				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
 
 			if (!response.ok) {
 				setError("Something went wrong. Please try again.");
-				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
@@ -310,17 +318,27 @@ export function useChat() {
 				setConversationId(conversationId);
 			}
 
+			const assistantId = crypto.randomUUID();
 			const assistantMessage: ChatMessage = {
-				id: crypto.randomUUID(),
+				id: assistantId,
 				role: "assistant",
 				content: "",
 			};
 			setMessages((prev) => [...prev, assistantMessage]);
 
+			// Update this stream's assistant message by id rather than "last in
+			// array" so a stray concurrent update can never write into it.
+			const updateAssistant = (
+				update: (message: ChatMessage) => ChatMessage,
+			) => {
+				setMessages((prev) =>
+					prev.map((m) => (m.id === assistantId ? update(m) : m)),
+				);
+			};
+
 			const reader = response.body?.getReader();
 			if (!reader) {
 				setError("Failed to read response stream.");
-				clearTimeout(timeoutId);
 				setIsStreaming(false);
 				return;
 			}
@@ -328,8 +346,9 @@ export function useChat() {
 			const decoder = new TextDecoder();
 			let buffer = "";
 			let firstTokenSeen = false;
+			let streamErrored = false;
 
-			while (true) {
+			while (!streamErrored) {
 				const { done, value } = await reader.read();
 				if (done) break;
 
@@ -346,34 +365,25 @@ export function useChat() {
 						const event = JSON.parse(data);
 						if (event.type === "error" && event.message) {
 							setError(event.message);
-							setMessages((prev) => {
-								const updated = [...prev];
-								const last = updated[updated.length - 1];
-								if (
-									last?.role === "assistant" &&
-									last.content === ""
-								) {
-									updated.pop();
-								}
-								return updated;
-							});
+							setMessages((prev) =>
+								prev.filter(
+									(m) => !(m.id === assistantId && m.content === ""),
+								),
+							);
+							// Stop consuming — without this, only the inner loop
+							// exits and the UI stays in "thinking" until the
+							// server closes the connection.
+							streamErrored = true;
 							break;
 						} else if (event.type === "text_delta" && event.delta) {
 							if (!firstTokenSeen) {
 								setHasFirstToken(true);
 								firstTokenSeen = true;
 							}
-							setMessages((prev) => {
-								const updated = [...prev];
-								const last = updated[updated.length - 1];
-								if (last?.role === "assistant") {
-									updated[updated.length - 1] = {
-										...last,
-										content: last.content + event.delta,
-									};
-								}
-								return updated;
-							});
+							updateAssistant((m) => ({
+								...m,
+								content: m.content + event.delta,
+							}));
 						} else if (event.type === "tool_result") {
 							const toolEvent = event as ToolResultEvent;
 							if (!toolEvent.successful) continue;
@@ -393,26 +403,22 @@ export function useChat() {
 							);
 							if (newRefs.length === 0) continue;
 
-							setMessages((prev) => {
-								const updated = [...prev];
-								const last = updated[updated.length - 1];
-								if (last?.role === "assistant") {
-									const existing = last.references ?? [];
-									updated[updated.length - 1] = {
-										...last,
-										references: deduplicateReferences([
-											...existing,
-											...newRefs,
-										]),
-									};
-								}
-								return updated;
-							});
+							updateAssistant((m) => ({
+								...m,
+								references: deduplicateReferences([
+									...(m.references ?? []),
+									...newRefs,
+								]),
+							}));
 						}
 					} catch {
 						// Skip unparseable lines
 					}
 				}
+			}
+
+			if (streamErrored) {
+				await reader.cancel().catch(() => {});
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") {
@@ -427,6 +433,7 @@ export function useChat() {
 			}
 		} finally {
 			clearTimeout(timeoutId);
+			streamingRef.current = false;
 			setIsStreaming(false);
 			setHasFirstToken(false);
 			abortControllerRef.current = null;

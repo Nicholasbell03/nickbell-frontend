@@ -8,6 +8,7 @@ import {
   $heroInputVisible,
   $hasExistingConversation,
   $chatActions,
+  $isStreaming,
 } from '@/stores/chat';
 
 const SUGGESTIONS = [
@@ -53,6 +54,7 @@ export default function HeroChat() {
   const isPanelOpen = useStore($isPanelOpen);
   const hasExistingConversation = useStore($hasExistingConversation);
   const chatActions = useStore($chatActions);
+  const isStreaming = useStore($isStreaming);
 
   const placeholderText = useTypewriter({
     words: TYPEWRITER_QUESTIONS,
@@ -98,7 +100,7 @@ export default function HeroChat() {
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      if (!query.trim() || !chatActions) return;
+      if (!query.trim() || !chatActions || isStreaming) return;
 
       setShowSuggestions(false);
 
@@ -112,12 +114,12 @@ export default function HeroChat() {
       chatActions.openPanel();
       setQuery('');
     },
-    [query, hasExistingConversation, chatActions],
+    [query, hasExistingConversation, chatActions, isStreaming],
   );
 
   const handleSuggestionSelect = useCallback(
     (value: string) => {
-      if (!chatActions) return;
+      if (!chatActions || isStreaming) return;
       setShowSuggestions(false);
 
       if (hasExistingConversation) {
@@ -129,23 +131,23 @@ export default function HeroChat() {
       chatActions.sendMessage(value);
       chatActions.openPanel();
     },
-    [hasExistingConversation, chatActions],
+    [hasExistingConversation, chatActions, isStreaming],
   );
 
   const handleNewConversation = useCallback(() => {
-    if (!pendingQuery || !chatActions) return;
+    if (!pendingQuery || !chatActions || isStreaming) return;
     chatActions.clearChat();
     chatActions.sendMessage(pendingQuery);
     chatActions.openPanel();
     setPendingQuery(null);
-  }, [pendingQuery, chatActions]);
+  }, [pendingQuery, chatActions, isStreaming]);
 
   const handleContinue = useCallback(() => {
-    if (!pendingQuery || !chatActions) return;
+    if (!pendingQuery || !chatActions || isStreaming) return;
     chatActions.sendMessage(pendingQuery);
     chatActions.openPanel();
     setPendingQuery(null);
-  }, [pendingQuery, chatActions]);
+  }, [pendingQuery, chatActions, isStreaming]);
 
   const handleDismiss = useCallback(() => {
     setPendingQuery(null);
@@ -234,9 +236,9 @@ export default function HeroChat() {
                 />
                 <button
                   type="submit"
-                  disabled={!query.trim() || !chatActions}
+                  disabled={!query.trim() || !chatActions || isStreaming}
                   className={`absolute right-5 p-1.5 rounded-full transition-all ${
-                    query.trim() && chatActions
+                    query.trim() && chatActions && !isStreaming
                       ? 'bg-emerald-500 hover:bg-emerald-400 text-white opacity-100'
                       : 'bg-emerald-500/20 text-emerald-500/40 opacity-0 pointer-events-none'
                   }`}

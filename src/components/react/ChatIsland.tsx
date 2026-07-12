@@ -1,6 +1,6 @@
 import { useEffect, useCallback, useState } from 'react';
 import { useChat } from '@/hooks/useChat';
-import { $isPanelOpen, $heroInputVisible, $hasExistingConversation, $chatActions } from '@/stores/chat';
+import { $isPanelOpen, $heroInputVisible, $hasExistingConversation, $chatActions, $isStreaming } from '@/stores/chat';
 import { useStore } from '@nanostores/react';
 import { ChatContext } from './chatContext';
 import { ChatPanel } from './ChatPanel';
@@ -21,10 +21,32 @@ export default function ChatIsland() {
   const openPanel = useCallback(() => setIsPanelOpen(true), []);
   const closePanel = useCallback(() => setIsPanelOpen(false), []);
 
+  // $heroInputVisible defaults true (widget hidden) to match SSR output, but
+  // only HeroChat on the homepage ever updates it. On a direct load of any
+  // other page it would stay true forever, permanently hiding the widget.
+  useEffect(() => {
+    if (window.location.pathname !== '/') {
+      $heroInputVisible.set(false);
+    }
+  }, []);
+
   // Sync panel state to Nano Store
   useEffect(() => {
     $isPanelOpen.set(isPanelOpen);
   }, [isPanelOpen]);
+
+  // Sync streaming state to Nano Store so HeroChat can block concurrent sends
+  useEffect(() => {
+    $isStreaming.set(chat.isStreaming);
+  }, [chat.isStreaming]);
+
+  // Reset on unmount so an island removed mid-stream can't leave the store
+  // stuck true, which would permanently disable HeroChat submits.
+  useEffect(() => {
+    return () => {
+      $isStreaming.set(false);
+    };
+  }, []);
 
   // Sync conversation existence to Nano Store
   useEffect(() => {
