@@ -13,23 +13,25 @@ import type { ShareSummary } from '@/types/share';
 import type { Technology } from '@/types/technology';
 import type { GitHubActivity as GitHubActivityType } from '@/types/github';
 
-// Fetch all homepage data in parallel
+// Fetch all homepage data in parallel; null marks a failed section
 const [blogsRes, projectsRes, sharesRes, techRes, githubRes] = await Promise.all([
-  fetchApi<{ data: BlogSummary[] }>('/api/v1/blogs/featured').catch(() => ({ data: [] })),
-  fetchApi<{ data: ProjectSummary[] }>('/api/v1/projects/featured').catch(() => ({ data: [] })),
-  fetchApi<{ data: ShareSummary[] }>('/api/v1/shares/featured').catch(() => ({ data: [] })),
-  fetchApi<{ data: Technology[] }>('/api/v1/technologies').catch(() => ({ data: [] })),
+  fetchApi<{ data: BlogSummary[] }>('/api/v1/blogs/featured').catch(() => null),
+  fetchApi<{ data: ProjectSummary[] }>('/api/v1/projects/featured').catch(() => null),
+  fetchApi<{ data: ShareSummary[] }>('/api/v1/shares/featured').catch(() => null),
+  fetchApi<{ data: Technology[] }>('/api/v1/technologies').catch(() => null),
   fetchApi<{ data: GitHubActivityType }>('/api/v1/github/activity').catch(() => null),
 ]);
 
-const blogs = blogsRes.data;
-const projects = projectsRes.data;
-const shares = sharesRes.data;
-const technologies = techRes.data;
+const blogs = blogsRes?.data ?? [];
+const projects = projectsRes?.data ?? [];
+const shares = sharesRes?.data ?? [];
+const technologies = techRes?.data ?? [];
 const githubActivity = githubRes?.data ?? null;
 
-// CDN cache: 1 hour fresh, 1 day stale-while-revalidate
-setCdnCache(Astro.response, blogs, { sMaxAge: 3600, swr: 86400 });
+// CDN cache: 1 hour fresh, 1 day stale-while-revalidate. Skipped when any
+// section failed so a degraded page is never durably cached at the edge.
+const allSucceeded = blogsRes && projectsRes && sharesRes && techRes && githubRes;
+setCdnCache(Astro.response, allSucceeded ? blogs : null, { sMaxAge: 3600, swr: 86400 });
 ---
 
 <Layout
