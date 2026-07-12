@@ -40,6 +40,14 @@ export default function ChatIsland() {
     $isStreaming.set(chat.isStreaming);
   }, [chat.isStreaming]);
 
+  // Reset on unmount so an island removed mid-stream can't leave the store
+  // stuck true, which would permanently disable HeroChat submits.
+  useEffect(() => {
+    return () => {
+      $isStreaming.set(false);
+    };
+  }, []);
+
   // Sync conversation existence to Nano Store
   useEffect(() => {
     $hasExistingConversation.set(chat.messages.length > 0);
