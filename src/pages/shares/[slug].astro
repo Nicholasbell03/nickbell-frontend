@@ -5,6 +5,8 @@ import RelatedContentCard from '@/components/RelatedContentCard.astro';
 import XPostCard from '@/components/XPostCard.astro';
 import LinkedInCard from '@/components/LinkedInCard.astro';
 import WebpageCard from '@/components/WebpageCard.astro';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { EmbeddedTweet } from 'react-tweet';
 import { getTweet } from 'react-tweet/api';
 import { fetchApi, isApiStatus } from '@/lib/api';
@@ -38,15 +40,31 @@ try {
 if (!share) return Astro.rewrite('/404');
 
 // For x_post shares, try to fetch the full tweet from Twitter's syndication
-// CDN at SSR time. If it succeeds we render the rich react-tweet embed; if it
-// fails (deleted tweet, rate limit, endpoint changes), we fall back to the
-// custom XPostCard which only depends on the data already stored on the share.
-let tweet: Awaited<ReturnType<typeof getTweet>> | null = null;
+// CDN at SSR time and render the rich react-tweet embed. Both the fetch AND
+// the render happen here in the frontmatter — before response headers go out.
+// EmbeddedTweet can throw on unexpected tweet payloads (e.g. long note
+// tweets: "entities is not iterable"); if it threw mid-template the stream
+// would be truncated to an empty 200 that the CDN durably caches (blank
+// page). Rendering to a string up front lets any failure fall back to the
+// custom XPostCard, which only depends on data already stored on the share.
+let tweetHtml: string | null = null;
 if (share.source_type === 'x_post' && share.embed_data?.tweet_id) {
+  let tweet: Awaited<ReturnType<typeof getTweet>> = undefined;
   try {
-    tweet = (await getTweet(share.embed_data.tweet_id)) ?? null;
+    tweet = await getTweet(share.embed_data.tweet_id, {
+      // Cap the syndication fetch so a hung request can't stall the page
+      signal: AbortSignal.timeout(4000),
+    });
   } catch (err) {
-    console.error('react-tweet getTweet failed', err);
+    console.error('x_post syndication fetch failed, using XPostCard fallback', err);
+  }
+
+  if (tweet) {
+    try {
+      tweetHtml = renderToStaticMarkup(createElement(EmbeddedTweet, { tweet }));
+    } catch (err) {
+      console.error('x_post embed render failed, using XPostCard fallback', err);
+    }
   }
 }
 
@@ -122,8 +140,8 @@ const sourceLinkLabel = sourceLinkLabels[share.source_type];
 
         {/* X/Twitter — rich syndication embed with custom-card fallback */}
         {share.source_type === 'x_post' && (
-          tweet
-            ? <div data-theme="dark" class="x-tweet-wrapper mx-auto w-4/5"><EmbeddedTweet tweet={tweet} /></div>
+          tweetHtml
+            ? <div data-theme="dark" class="x-tweet-wrapper mx-auto w-4/5" set:html={tweetHtml} />
             : <XPostCard share={share} />
         )}
 
