@@ -19,5 +19,7 @@ export interface Share extends ShareSummary {
   embed_data: {
     video_id?: string;
     tweet_id?: string;
+    /** Full X syndication payload stored at ingest (react-tweet Tweet shape). */
+    tweet?: unknown;
   } | null;
 }
