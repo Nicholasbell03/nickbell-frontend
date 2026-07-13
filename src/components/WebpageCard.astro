@@ -26,6 +26,7 @@ const sourceLabel = share.site_name ?? hostname;
         alt=""
         loading="lazy"
         class="w-full max-h-[24rem] object-contain"
+        onerror="this.parentElement.style.display='none'"
       />
     </a>
   )}

@@ -6,6 +6,9 @@ export function ChatWidget() {
 
   const isVisible = !heroInputVisible && !isPanelOpen;
 
+  // inert (vs aria-hidden + tabIndex) also releases focus the button held
+  // when it was clicked to open the panel — aria-hidden on a focused
+  // element is an accessibility violation.
   return (
     <button
       onClick={openPanel}
@@ -13,8 +16,7 @@ export function ChatWidget() {
         isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
       aria-label="Open chat"
-      aria-hidden={!isVisible}
-      tabIndex={isVisible ? 0 : -1}
+      inert={!isVisible}
     >
       <MessageSquare className="h-6 w-6" />
       {messages.length > 0 && (
