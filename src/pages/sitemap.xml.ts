@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { fetchAllPages } from '@/lib/content-index';
+import { fetchAllPages, siteOrigin } from '@/lib/content-index';
 import type { BlogSummary } from '@/types/blog';
 import type { ProjectSummary } from '@/types/project';
 import type { ShareSummary } from '@/types/share';
@@ -25,7 +25,7 @@ function escapeXml(value: string): string {
 }
 
 export const GET: APIRoute = async ({ site }) => {
-  const origin = (site ?? new URL('https://nickbell.dev')).origin;
+  const origin = siteOrigin(site);
 
   const [blogs, projects, shares] = await Promise.all([
     fetchAllPages<BlogSummary>('/api/v1/blogs'),
@@ -33,17 +33,27 @@ export const GET: APIRoute = async ({ site }) => {
     fetchAllPages<ShareSummary>('/api/v1/shares'),
   ]);
 
+  // null marks a failed fetch — serve what we have, but never let the CDN
+  // durably cache a degraded sitemap.
+  const allSucceeded = blogs !== null && projects !== null && shares !== null;
+
   const entries: SitemapEntry[] = [
     { loc: `${origin}/` },
     { loc: `${origin}/blog` },
     { loc: `${origin}/projects` },
     { loc: `${origin}/shares` },
-    ...blogs.map((b) => ({ loc: `${origin}/blog/${b.slug}`, lastmod: toIsoDate(b.published_at) })),
-    ...projects.map((p) => ({
+    ...(blogs ?? []).map((b) => ({
+      loc: `${origin}/blog/${b.slug}`,
+      lastmod: toIsoDate(b.published_at),
+    })),
+    ...(projects ?? []).map((p) => ({
       loc: `${origin}/projects/${p.slug}`,
       lastmod: toIsoDate(p.published_at),
     })),
-    ...shares.map((s) => ({ loc: `${origin}/shares/${s.slug}`, lastmod: toIsoDate(s.created_at) })),
+    ...(shares ?? []).map((s) => ({
+      loc: `${origin}/shares/${s.slug}`,
+      lastmod: toIsoDate(s.created_at),
+    })),
   ];
 
   const xml = [
@@ -66,7 +76,9 @@ export const GET: APIRoute = async ({ site }) => {
     headers: {
       'Content-Type': 'application/xml; charset=utf-8',
       // CDN cache: 1 day fresh, 7 days stale-while-revalidate
-      'Netlify-CDN-Cache-Control': 'durable, public, s-maxage=86400, stale-while-revalidate=604800',
+      ...(allSucceeded && {
+        'Netlify-CDN-Cache-Control': 'durable, public, s-maxage=86400, stale-while-revalidate=604800',
+      }),
     },
   });
 };

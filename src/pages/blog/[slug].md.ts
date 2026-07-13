@@ -1,10 +1,11 @@
 import type { APIRoute } from 'astro';
 import TurndownService from 'turndown';
 import { fetchApi } from '@/lib/api';
+import { siteOrigin } from '@/lib/content-index';
 import type { Blog } from '@/types/blog';
 
 export const GET: APIRoute = async ({ params, site }) => {
-  const origin = (site ?? new URL('https://nickbell.dev')).origin;
+  const origin = siteOrigin(site);
   const { slug } = params;
 
   let post: Blog;
