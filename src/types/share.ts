@@ -1,3 +1,5 @@
+import type { Tweet } from 'react-tweet/api';
+
 export type SourceType = 'webpage' | 'youtube' | 'x_post' | 'linkedin';
 
 export interface ShareSummary {
@@ -19,5 +21,7 @@ export interface Share extends ShareSummary {
   embed_data: {
     video_id?: string;
     tweet_id?: string;
+    /** Full X syndication payload stored at ingest. */
+    tweet?: Tweet;
   } | null;
 }

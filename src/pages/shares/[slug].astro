@@ -39,24 +39,31 @@ try {
 
 if (!share) return Astro.rewrite('/404');
 
-// For x_post shares, try to fetch the full tweet from Twitter's syndication
-// CDN at SSR time and render the rich react-tweet embed. Both the fetch AND
-// the render happen here in the frontmatter — before response headers go out.
+// For x_post shares, render the rich react-tweet embed. The API stores the
+// full syndication payload at ingest (embed_data.tweet), so most renders need
+// zero calls to X; the live syndication fetch remains only as a fallback for
+// older shares ingested before payloads were stored. Both the fetch AND the
+// render happen here in the frontmatter — before response headers go out.
 // EmbeddedTweet can throw on unexpected tweet payloads (e.g. long note
 // tweets: "entities is not iterable"); if it threw mid-template the stream
 // would be truncated to an empty 200 that the CDN durably caches (blank
 // page). Rendering to a string up front lets any failure fall back to the
 // custom XPostCard, which only depends on data already stored on the share.
+const TWEET_FETCH_TIMEOUT_MS = 4000;
+
 let tweetHtml: string | null = null;
 if (share.source_type === 'x_post' && share.embed_data?.tweet_id) {
-  let tweet: Awaited<ReturnType<typeof getTweet>> = undefined;
-  try {
-    tweet = await getTweet(share.embed_data.tweet_id, {
+  let tweet = share.embed_data.tweet;
+
+  if (!tweet) {
+    try {
       // Cap the syndication fetch so a hung request can't stall the page
-      signal: AbortSignal.timeout(4000),
-    });
-  } catch (err) {
-    console.error('x_post syndication fetch failed, using XPostCard fallback', err);
+      tweet = await getTweet(share.embed_data.tweet_id, {
+        signal: AbortSignal.timeout(TWEET_FETCH_TIMEOUT_MS),
+      });
+    } catch (err) {
+      console.error('x_post syndication fetch failed, using XPostCard fallback', err);
+    }
   }
 
   if (tweet) {
