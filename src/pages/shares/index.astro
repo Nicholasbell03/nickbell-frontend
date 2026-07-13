@@ -66,6 +66,7 @@ const SOURCE_BADGE: Record<SourceType, { label: string }> = {
                     alt={share.title ?? ''}
                     loading="lazy"
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    onerror="this.style.display='none'"
                   />
                 ) : (
                   <div class="w-full h-full bg-gradient-to-br from-emerald-500/10 to-emerald-500/5 flex items-center justify-center">

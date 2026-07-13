@@ -419,6 +419,16 @@ export function useChat() {
 
 			if (streamErrored) {
 				await reader.cancel().catch(() => {});
+			} else if (!firstTokenSeen) {
+				// The stream ended without a single token or error event (e.g.
+				// the server died mid-stream) — never leave a blank assistant
+				// bubble with no explanation.
+				setError(
+					"The assistant couldn't generate a response. Please try again later.",
+				);
+				setMessages((prev) =>
+					prev.filter((m) => !(m.id === assistantId && m.content === "")),
+				);
 			}
 		} catch (err) {
 			if (err instanceof DOMException && err.name === "AbortError") {
