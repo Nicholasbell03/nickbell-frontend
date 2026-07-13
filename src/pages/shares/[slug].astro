@@ -49,16 +49,17 @@ if (!share) return Astro.rewrite('/404');
 // would be truncated to an empty 200 that the CDN durably caches (blank
 // page). Rendering to a string up front lets any failure fall back to the
 // custom XPostCard, which only depends on data already stored on the share.
+const TWEET_FETCH_TIMEOUT_MS = 4000;
+
 let tweetHtml: string | null = null;
 if (share.source_type === 'x_post' && share.embed_data?.tweet_id) {
-  let tweet: Awaited<ReturnType<typeof getTweet>> =
-    (share.embed_data.tweet as Awaited<ReturnType<typeof getTweet>>) ?? undefined;
+  let tweet = share.embed_data.tweet;
 
   if (!tweet) {
     try {
+      // Cap the syndication fetch so a hung request can't stall the page
       tweet = await getTweet(share.embed_data.tweet_id, {
-        // Cap the syndication fetch so a hung request can't stall the page
-        signal: AbortSignal.timeout(4000),
+        signal: AbortSignal.timeout(TWEET_FETCH_TIMEOUT_MS),
       });
     } catch (err) {
       console.error('x_post syndication fetch failed, using XPostCard fallback', err);
