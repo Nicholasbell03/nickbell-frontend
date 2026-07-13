@@ -9630,7 +9630,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     react-icons: "npm:^5.5.0"
     react-markdown: "npm:^10.1.0"
-    react-tweet: "npm:^3.3.0"
+    react-tweet: "npm:^3.3.1"
     sanitize-html: "npm:^2.17.2"
     tailwind-merge: "npm:^3.4.0"
     tailwindcss: "npm:^4.1.17"
@@ -10651,9 +10651,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-tweet@npm:^3.3.0":
-  version: 3.3.0
-  resolution: "react-tweet@npm:3.3.0"
+"react-tweet@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "react-tweet@npm:3.3.1"
   dependencies:
     "@swc/helpers": "npm:^0.5.3"
     clsx: "npm:^2.0.0"
@@ -10661,7 +10661,7 @@ __metadata:
   peerDependencies:
     react: ^18.0.0 || ^19.0.0
     react-dom: ^18.0.0 || ^19.0.0
-  checksum: 10c0/4c684f813d83f5320be26a9048f0ec016e88fdb8972efb46088761031adc00264be51db545442b0db8c2051ded29279e0ad4027016febd73fb2141c20931fde0
+  checksum: 10c0/7ceadfe3fc0abd9405eb0dcea9db98ad292737a8598f1a24cce7dc0c9819e58b8933501706d4b4234fedd985e2f23bfccfc1ea00bd37bd03e17b6dee6528bcb6
   languageName: node
   linkType: hard
 
