@@ -39,6 +39,17 @@ const sanitizedContent = sanitizeCmsHtml(post.content);
 
 // CDN cache: 7 days fresh, 30 days stale-while-revalidate (skipped for previews)
 setCdnCache(Astro.response, token ? null : post, { sMaxAge: 604800, swr: 2592000 });
+
+const blogSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.meta_description ?? post.excerpt ?? undefined,
+  datePublished: post.published_at,
+  image: post.featured_image ?? undefined,
+  author: { '@type': 'Person', name: 'Nicholas Bell', url: 'https://nickbell.dev' },
+  mainEntityOfPage: `https://nickbell.dev/blog/${post.slug}`,
+};
 ---
 
 <Layout
@@ -48,6 +59,8 @@ setCdnCache(Astro.response, token ? null : post, { sMaxAge: 604800, swr: 2592000
   type="article"
   publishedTime={post.published_at}
 >
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(blogSchema)} />
+
   <div class="py-16 md:py-24 px-4">
     {token && (
       <div class="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-amber-950 py-2 px-4 text-center font-medium">

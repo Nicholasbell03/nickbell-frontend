@@ -32,12 +32,27 @@ const githubActivity = githubRes?.data ?? null;
 // section failed so a degraded page is never durably cached at the edge.
 const allSucceeded = blogsRes && projectsRes && sharesRes && techRes && githubRes;
 setCdnCache(Astro.response, allSucceeded ? blogs : null, { sMaxAge: 3600, swr: 86400 });
+
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Nicholas Bell',
+  url: 'https://nickbell.dev',
+  jobTitle: 'Software Engineer',
+  sameAs: [
+    'https://github.com/Nicholasbell03',
+    'https://linkedin.com/in/nicholas-j-bell',
+    'https://x.com/nickbell03',
+  ],
+};
 ---
 
 <Layout
   title="Nicholas Bell | Software Engineer"
   description="Software engineer building modern web applications. Blog posts, projects, and curated links."
 >
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)} />
+
   <!-- Hero with chat input (React island) -->
   <HeroChat client:load />
 
