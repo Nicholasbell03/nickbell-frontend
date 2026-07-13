@@ -4,8 +4,17 @@
 // pipeline — no external cron needed.
 const CONCURRENCY = 8;
 const REQUEST_TIMEOUT_MS = 30_000;
+// Safety cap so a runaway sitemap can never burn build minutes.
+const MAX_URLS = 500;
 
 export const onSuccess = async ({ utils }) => {
+  // Only production deploys purge (and serve) the production cache — warming
+  // from previews/branch deploys would crawl the live domain pointlessly.
+  if (process.env.CONTEXT && process.env.CONTEXT !== 'production') {
+    console.log(`warm-pages: skipping for context "${process.env.CONTEXT}"`);
+    return;
+  }
+
   const base = (process.env.URL || 'https://nickbell.dev').replace(/\/$/, '');
 
   try {
@@ -17,9 +26,13 @@ export const onSuccess = async ({ utils }) => {
     }
 
     const xml = await sitemapRes.text();
-    const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    let urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
     if (urls.length === 0) {
       throw new Error('sitemap contained no URLs');
+    }
+    if (urls.length > MAX_URLS) {
+      console.warn(`warm-pages: sitemap has ${urls.length} URLs, warming only the first ${MAX_URLS}`);
+      urls = urls.slice(0, MAX_URLS);
     }
 
     let warmed = 0;
