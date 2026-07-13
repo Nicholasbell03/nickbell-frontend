@@ -4,7 +4,7 @@
 # After each successful deploy (which purges the durable CDN cache), crawl
 # the sitemap so every page is warm at the edge before visitors arrive.
 [[plugins]]
-  package = "/plugins/warm-pages"
+  package = "./plugins/warm-pages"
 
 # Redirect admin to Laravel backend
 [[redirects]]
