@@ -49,16 +49,22 @@ if (!share) return Astro.rewrite('/404');
 // custom XPostCard, which only depends on data already stored on the share.
 let tweetHtml: string | null = null;
 if (share.source_type === 'x_post' && share.embed_data?.tweet_id) {
+  let tweet: Awaited<ReturnType<typeof getTweet>> = undefined;
   try {
-    const tweet = await getTweet(share.embed_data.tweet_id, {
+    tweet = await getTweet(share.embed_data.tweet_id, {
       // Cap the syndication fetch so a hung request can't stall the page
       signal: AbortSignal.timeout(4000),
     });
-    if (tweet) {
-      tweetHtml = renderToStaticMarkup(createElement(EmbeddedTweet, { tweet }));
-    }
   } catch (err) {
-    console.error('x_post embed failed, using XPostCard fallback', err);
+    console.error('x_post syndication fetch failed, using XPostCard fallback', err);
+  }
+
+  if (tweet) {
+    try {
+      tweetHtml = renderToStaticMarkup(createElement(EmbeddedTweet, { tweet }));
+    } catch (err) {
+      console.error('x_post embed render failed, using XPostCard fallback', err);
+    }
   }
 }
 
