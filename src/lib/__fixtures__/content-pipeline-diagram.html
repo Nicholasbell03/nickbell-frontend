@@ -1,0 +1,93 @@
+<svg viewBox="0 0 800 720" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:800px;margin:2rem auto;display:block;font-family:'Inter',system-ui,sans-serif;">
+  <rect width="800" height="720" rx="12" fill="#0f172a"/>
+
+  <!-- Title -->
+  <text x="400" y="32" text-anchor="middle" fill="#e2e8f0" font-size="12" font-weight="600">THE CONFIRMATION FLOW</text>
+
+  <!-- Central spine -->
+  <line x1="400" y1="50" x2="400" y2="680" stroke="#1e293b" stroke-width="3"/>
+
+  <!-- Step 1: /confirm -->
+  <circle cx="400" cy="80" r="15" fill="#10b981"/>
+  <text x="400" y="85" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">1</text>
+  <rect x="440" y="60" width="220" height="44" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+  <text x="550" y="78" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">NICK</text>
+  <text x="550" y="94" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Runs /weekly-content-confirm</text>
+
+  <!-- Step 2: Read ideas -->
+  <circle cx="400" cy="140" r="15" fill="#0ea5e9"/>
+  <text x="400" y="145" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">2</text>
+  <rect x="140" y="120" width="220" height="44" rx="8" fill="#1e293b" stroke="#0ea5e9" stroke-width="1.5"/>
+  <text x="250" y="138" text-anchor="middle" fill="#0ea5e9" font-size="10" font-weight="600">CLAUDE CODE</text>
+  <text x="250" y="154" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Reads latest ideas JSON</text>
+
+  <!-- Step 3: Present + pick -->
+  <circle cx="400" cy="200" r="15" fill="#10b981"/>
+  <text x="400" y="205" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">3</text>
+  <rect x="440" y="180" width="220" height="44" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+  <text x="550" y="198" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">NICK ↔ CLAUDE CODE</text>
+  <text x="550" y="214" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Present ideas → Pick one</text>
+
+  <!-- Fork -->
+  <circle cx="400" cy="270" r="3" fill="#64748b"/>
+  <line x1="400" y1="273" x2="280" y2="310" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="400" y1="273" x2="520" y2="310" stroke="#64748b" stroke-width="1.5"/>
+
+  <!-- Parallel bracket -->
+  <rect x="175" y="295" width="450" height="85" rx="10" fill="none" stroke="#64748b" stroke-width="1" stroke-dasharray="5,3"/>
+  <text x="400" y="312" text-anchor="middle" fill="#64748b" font-size="9" font-weight="600">PARALLEL RESEARCH</text>
+
+  <!-- Step 4: GitHub -->
+  <circle cx="280" cy="340" r="15" fill="#f59e0b"/>
+  <text x="280" y="345" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">4</text>
+  <text x="280" y="372" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="600">GITHUB API</text>
+  <text x="280" y="387" text-anchor="middle" fill="#e2e8f0" font-size="10">gh pr view #57 — diffs + meta</text>
+
+  <!-- Step 5: Codebase -->
+  <circle cx="520" cy="340" r="15" fill="#f59e0b"/>
+  <text x="520" y="345" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">5</text>
+  <text x="520" y="372" text-anchor="middle" fill="#f59e0b" font-size="9" font-weight="600">LOCAL CODEBASE</text>
+  <text x="520" y="387" text-anchor="middle" fill="#e2e8f0" font-size="10">Read 5–8 key source files</text>
+
+  <!-- Merge -->
+  <line x1="280" y1="395" x2="400" y2="425" stroke="#64748b" stroke-width="1.5"/>
+  <line x1="520" y1="395" x2="400" y2="425" stroke="#64748b" stroke-width="1.5"/>
+  <circle cx="400" cy="425" r="3" fill="#64748b"/>
+
+  <!-- Step 6: Generate draft -->
+  <circle cx="400" cy="460" r="15" fill="#0ea5e9"/>
+  <text x="400" y="465" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">6</text>
+  <rect x="140" y="440" width="220" height="44" rx="8" fill="#1e293b" stroke="#0ea5e9" stroke-width="1.5"/>
+  <text x="250" y="458" text-anchor="middle" fill="#0ea5e9" font-size="10" font-weight="600">CLAUDE CODE</text>
+  <text x="250" y="474" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Generate ~1200 word draft</text>
+
+  <!-- Step 7: Review loop -->
+  <circle cx="400" cy="520" r="15" fill="#10b981"/>
+  <text x="400" y="525" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">7</text>
+  <rect x="440" y="500" width="220" height="44" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+  <text x="550" y="518" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">NICK ↔ CLAUDE CODE</text>
+  <text x="550" y="534" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Review · Iterate · Approve</text>
+  <path d="M 660,522 C 690,522 690,480 660,480" fill="none" stroke="#10b981" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="662,476 656,483 665,483" fill="#10b981"/>
+  <text x="700" y="504" fill="#94a3b8" font-size="8">iterate</text>
+
+  <!-- Step 8: POST to API -->
+  <circle cx="400" cy="585" r="15" fill="#a78bfa"/>
+  <text x="400" y="590" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">8</text>
+  <rect x="140" y="565" width="220" height="44" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="250" y="583" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">LARAVEL API</text>
+  <text x="250" y="599" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">POST /api/v1/blogs → 201</text>
+
+  <!-- Step 9: Slack notify -->
+  <circle cx="400" cy="645" r="15" fill="#a78bfa"/>
+  <text x="400" y="650" text-anchor="middle" fill="#0f172a" font-size="11" font-weight="700">9</text>
+  <rect x="440" y="625" width="220" height="44" rx="8" fill="#1e293b" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="550" y="643" text-anchor="middle" fill="#a78bfa" font-size="10" font-weight="600">SLACK</text>
+  <text x="550" y="659" text-anchor="middle" fill="#e2e8f0" font-size="11" font-weight="700">Notify with admin_url</text>
+
+  <!-- Done -->
+  <rect x="365" y="682" width="70" height="24" rx="6" fill="#065f46"/>
+  <text x="400" y="698" text-anchor="middle" fill="#34d399" font-size="10" font-weight="700">DONE</text>
+
+  <text x="400" y="718" text-anchor="middle" fill="#64748b" font-size="10">The confirmation flow — from /confirm to published draft with human review at every step</text>
+</svg>
