@@ -40,16 +40,19 @@ function truncate(text: string | null, maxLength = 80): string {
 /** Debounced search hook replacing React Query */
 function useSearch(query: string) {
   const [results, setResults] = useState<SearchResults | undefined>();
-  const [isLoading, setIsLoading] = useState(false);
+  // The last query whose request finished. While it differs from `query`, a search is in flight.
+  const [settledQuery, setSettledQuery] = useState<string | null>(null);
+  const isActive = query.length >= 2;
+
+  // Reset once the query is too short, during render rather than in the effect.
+  if (!isActive && (results !== undefined || settledQuery !== null)) {
+    setResults(undefined);
+    setSettledQuery(null);
+  }
 
   useEffect(() => {
-    if (query.length < 2) {
-      setResults(undefined);
-      setIsLoading(false);
-      return;
-    }
+    if (!isActive) return;
     const controller = new AbortController();
-    setIsLoading(true);
 
     const timer = setTimeout(async () => {
       try {
@@ -59,7 +62,7 @@ function useSearch(query: string) {
         /* aborted or error */
       } finally {
         if (!controller.signal.aborted) {
-          setIsLoading(false);
+          setSettledQuery(query);
         }
       }
     }, 300);
@@ -68,9 +71,9 @@ function useSearch(query: string) {
       clearTimeout(timer);
       controller.abort();
     };
-  }, [query]);
+  }, [query, isActive]);
 
-  return { results, isLoading };
+  return { results, isLoading: isActive && settledQuery !== query };
 }
 
 interface SearchBarProps {
