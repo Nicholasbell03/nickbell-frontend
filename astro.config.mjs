@@ -6,6 +6,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://nickbell.dev',
   output: 'server',
+  // Astro 7 defaults to JSX whitespace rules ('jsx'), which drops spaces between
+  // inline elements. Keep the v6 HTML-aware behaviour so rendering is unchanged.
+  compressHTML: true,
   adapter: netlify(),
   integrations: [react()],
   vite: {
