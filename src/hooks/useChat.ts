@@ -228,6 +228,8 @@ export function useChat() {
 	// Hydrate messages from localStorage after mount to avoid SSR mismatch
 	useEffect(() => {
 		const stored = loadMessages();
+		// Deliberate post-mount setState: localStorage isn't available during SSR.
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		if (stored.length > 0) setMessages(stored);
 	}, []);
 

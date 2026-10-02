@@ -14,10 +14,11 @@ import {
   SiRedis,
   SiVite,
   SiTailwindcss,
-  SiAmazonwebservices,
   SiDocker,
   SiReact,
 } from 'react-icons/si';
+// Simple Icons dropped the AWS brand icon (react-icons 5.7), so use Font Awesome's.
+import { FaAws } from 'react-icons/fa';
 import type { IconType } from 'react-icons';
 import type { Technology } from '@/types/technology';
 
@@ -35,7 +36,7 @@ const iconMap: Partial<Record<string, IconType>> = {
   redis: SiRedis,
   vite: SiVite,
   tailwind: SiTailwindcss,
-  aws: SiAmazonwebservices,
+  aws: FaAws,
   docker: SiDocker,
 };
 
