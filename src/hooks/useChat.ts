@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { chatApi } from "@/lib/client-api";
+import { readSseErrorMessage } from "@/lib/sse";
+import { getTurnstileToken, TurnstileError } from "@/lib/turnstile";
 import type { ChatMessage, ContentReference } from "@/types/chat";
 
 const CONVERSATION_ID_KEY = "chat_conversation_id";
@@ -282,33 +284,38 @@ export function useChat() {
 		const abortController = new AbortController();
 		abortControllerRef.current = abortController;
 		let timedOut = false;
-
-		// Connection timeout only — cleared once headers arrive so long
-		// streaming responses aren't aborted mid-answer.
-		const timeoutId = setTimeout(() => {
-			timedOut = true;
-			abortController.abort();
-		}, 30000);
+		let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
 		try {
+			// Fresh single-use bot-protection token per message (null when
+			// Turnstile isn't configured). Has its own timeout; the stop
+			// button aborts it via the shared signal.
+			const turnstileToken = await getTurnstileToken(abortController.signal);
+
+			// Connection timeout only — cleared once headers arrive so long
+			// streaming responses aren't aborted mid-answer.
+			timeoutId = setTimeout(() => {
+				timedOut = true;
+				abortController.abort();
+			}, 30000);
+
 			const response = await chatApi.streamChat(
 				text,
 				getConversationId(),
+				turnstileToken,
 				abortController.signal,
 			);
 
 			clearTimeout(timeoutId);
 
-			if (response.status === 429) {
-				setError(
-					"You're sending messages too quickly. Please wait a moment and try again.",
-				);
-				setIsStreaming(false);
-				return;
-			}
-
 			if (!response.ok) {
-				setError("Something went wrong. Please try again.");
+				const serverMessage = await readSseErrorMessage(response);
+				setError(
+					serverMessage ??
+						(response.status === 429
+							? "You're sending messages too quickly. Please wait a moment and try again."
+							: "Something went wrong. Please try again."),
+				);
 				setIsStreaming(false);
 				return;
 			}
@@ -438,6 +445,8 @@ export function useChat() {
 					);
 				}
 				// Otherwise user cancelled — not an error
+			} else if (err instanceof TurnstileError) {
+				setError(err.message);
 			} else {
 				setError("Something went wrong. Please try again.");
 			}

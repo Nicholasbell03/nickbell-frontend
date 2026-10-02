@@ -19,3 +19,17 @@
   to = "https://api.nickbell.dev/feed"
   status = 200
   force = true
+
+# Security headers for files the CDN serves directly (/_astro/*, public/).
+# Netlify doesn't apply these to SSR function responses, so every page gets
+# them (plus a Report-Only CSP) from src/middleware.ts instead — keep both in
+# sync with src/lib/securityHeaders.ts (enforced by securityHeaders.test.ts).
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+    Content-Security-Policy = "frame-ancestors 'none'"

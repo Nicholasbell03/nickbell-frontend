@@ -5,6 +5,7 @@ import GitHubActivity from '@/components/react/GitHubActivity';
 import TechStack from '@/components/react/TechStack';
 import { fetchApi } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
+import { serializeJsonLd } from '@/lib/jsonLd';
 import { formatDistanceToNow } from 'date-fns';
 import { safeHostname, stripHtml } from '@/lib/utils';
 import type { BlogSummary } from '@/types/blog';
@@ -51,7 +52,7 @@ const personSchema = {
   title="Nicholas Bell | Software Engineer"
   description="Software engineer building modern web applications. Blog posts, projects, and curated links."
 >
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)} />
+  <script type="application/ld+json" is:inline set:html={serializeJsonLd(personSchema)} />
 
   <!-- Hero with chat input (React island) -->
   <HeroChat client:load />

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Search, ChevronDown, ArrowRight } from 'lucide-react';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useTypewriter } from '@/hooks/useTypewriter';
+import { preloadTurnstile } from '@/lib/turnstile';
 import { useStore } from '@nanostores/react';
 import {
   $isPanelOpen,
@@ -223,7 +224,11 @@ export default function HeroChat() {
                     setQuery(e.target.value);
                     setFocusedIndex(-1);
                   }}
-                  onFocus={() => setShowSuggestions(true)}
+                  onFocus={() => {
+                    setShowSuggestions(true);
+                    // Warm up bot protection before the first message is sent
+                    preloadTurnstile();
+                  }}
                   onKeyDown={handleKeyDown}
                   placeholder={placeholderText}
                   enterKeyHint="send"
