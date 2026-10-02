@@ -11,11 +11,16 @@ export const chatApi = {
   streamChat(
     message: string,
     conversationId: string | null,
+    turnstileToken: string | null,
     signal?: AbortSignal,
   ): Promise<Response> {
+    const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+    // Single-use bot-protection token, verified by the backend (see lib/turnstile.ts)
+    if (turnstileToken) headers['X-Turnstile-Token'] = turnstileToken;
+
     return fetch(`${API_BASE}/api/v1/chat`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ message, conversation_id: conversationId }),
       signal,
     });

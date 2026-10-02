@@ -5,6 +5,7 @@ import { useStore } from '@nanostores/react';
 import { ChatContext } from './chatContext';
 import { ChatPanel } from './ChatPanel';
 import { ChatWidget } from './ChatWidget';
+import { preloadTurnstile } from '@/lib/turnstile';
 
 /**
  * Self-contained chat island. Wraps the full chat system (provider + panel + widget)
@@ -33,6 +34,12 @@ export default function ChatIsland() {
   // Sync panel state to Nano Store
   useEffect(() => {
     $isPanelOpen.set(isPanelOpen);
+  }, [isPanelOpen]);
+
+  // Lazily warm up bot protection the first time the chat is opened, so the
+  // Turnstile script never loads for visitors who don't use the chat.
+  useEffect(() => {
+    if (isPanelOpen) preloadTurnstile();
   }, [isPanelOpen]);
 
   // Sync streaming state to Nano Store so HeroChat can block concurrent sends

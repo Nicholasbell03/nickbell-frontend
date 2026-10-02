@@ -7,6 +7,8 @@ interface ImportMetaEnv {
   readonly PUBLIC_API_URL: string;
   /** Client-side: Cloudflare analytics token */
   readonly PUBLIC_CF_ANALYTICS_TOKEN: string;
+  /** Client-side: Cloudflare Turnstile site key for the chat. Unset disables Turnstile (local dev). */
+  readonly PUBLIC_TURNSTILE_SITE_KEY?: string;
 }
 
 interface ImportMeta {
