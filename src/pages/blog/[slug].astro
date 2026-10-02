@@ -4,6 +4,7 @@ import RelatedContentCard from '@/components/RelatedContentCard.astro';
 import { fetchApi, isApiStatus } from '@/lib/api';
 import { setCdnCache } from '@/lib/cache';
 import { sanitizeCmsHtml } from '@/lib/sanitize';
+import { serializeJsonLd } from '@/lib/jsonLd';
 import { getItemPath } from '@/lib/contentType';
 import { format } from 'date-fns';
 import type { Blog } from '@/types/blog';
@@ -59,7 +60,7 @@ const blogSchema = {
   type="article"
   publishedTime={post.published_at}
 >
-  <script type="application/ld+json" is:inline set:html={JSON.stringify(blogSchema)} />
+  <script type="application/ld+json" is:inline set:html={serializeJsonLd(blogSchema)} />
 
   <div class="py-16 md:py-24 px-4">
     {token && (
